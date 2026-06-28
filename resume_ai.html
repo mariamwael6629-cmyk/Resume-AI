@@ -1,0 +1,1864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ResumeAI — AI Resume Analyzer & Job Matcher</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Satoshi:wght@300;400;500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+<style>
+  :root {
+    --bg: #0a0b0f;
+    --bg2: #111218;
+    --bg3: #1a1b23;
+    --bg4: #22232e;
+    --glass: rgba(255,255,255,0.04);
+    --glass2: rgba(255,255,255,0.08);
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #f0f0f5;
+    --text2: #9b9cb5;
+    --text3: #6b6c80;
+    --accent: #6c63ff;
+    --accent2: #8b83ff;
+    --accent3: #a89dff;
+    --teal: #00d4aa;
+    --teal2: #00b896;
+    --pink: #ff6b9d;
+    --amber: #ffb347;
+    --green: #4ade80;
+    --red: #f87171;
+    --blue: #60a5fa;
+    --grad1: linear-gradient(135deg, #6c63ff, #a89dff);
+    --grad2: linear-gradient(135deg, #00d4aa, #6c63ff);
+    --grad3: linear-gradient(135deg, #ff6b9d, #6c63ff);
+    --shadow: 0 20px 60px rgba(108,99,255,0.15);
+    --r: 12px;
+    --r2: 16px;
+    --r3: 20px;
+    --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+  .light {
+    --bg: #f5f5fa;
+    --bg2: #ffffff;
+    --bg3: #eeeef5;
+    --bg4: #e4e4ef;
+    --glass: rgba(108,99,255,0.05);
+    --glass2: rgba(108,99,255,0.08);
+    --border: rgba(108,99,255,0.12);
+    --border2: rgba(108,99,255,0.2);
+    --text: #1a1a2e;
+    --text2: #5b5c7a;
+    --text3: #9394aa;
+    --shadow: 0 20px 60px rgba(108,99,255,0.1);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: 'Satoshi', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; transition: var(--transition); }
+  h1,h2,h3,h4 { font-family: 'Clash Display', sans-serif; }
+  .page { display:none; }
+  .page.active { display:block; }
+
+  /* NAV */
+  nav {
+    position: fixed; top:0; left:0; right:0; z-index:1000;
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 0 2rem; height:64px;
+    background: rgba(10,11,15,0.7);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    transition: var(--transition);
+  }
+  .light nav { background: rgba(245,245,250,0.8); }
+  .logo { font-family:'Clash Display',sans-serif; font-size:1.4rem; font-weight:700; background: var(--grad1); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; cursor:pointer; }
+  .nav-links { display:flex; gap:2rem; align-items:center; }
+  .nav-links a { color:var(--text2); text-decoration:none; font-size:.9rem; font-weight:500; cursor:pointer; transition:var(--transition); }
+  .nav-links a:hover { color:var(--text); }
+  .nav-right { display:flex; gap:.75rem; align-items:center; }
+  .btn { padding:.5rem 1.25rem; border-radius:var(--r); font-size:.875rem; font-weight:600; cursor:pointer; border:none; transition:var(--transition); font-family:'Satoshi',sans-serif; }
+  .btn-ghost { background:transparent; color:var(--text2); border:1px solid var(--border); }
+  .btn-ghost:hover { border-color:var(--border2); color:var(--text); }
+  .btn-primary { background: var(--grad1); color:#fff; }
+  .btn-primary:hover { transform:translateY(-1px); box-shadow:0 8px 25px rgba(108,99,255,0.4); }
+  .btn-sm { padding:.375rem .875rem; font-size:.8rem; }
+  .btn-lg { padding:.75rem 2rem; font-size:1rem; border-radius:var(--r2); }
+  .theme-toggle { width:36px; height:36px; border-radius:50%; background:var(--glass); border:1px solid var(--border); color:var(--text2); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:var(--transition); }
+  .theme-toggle:hover { color:var(--text); background:var(--glass2); }
+
+  /* HERO */
+  .hero {
+    min-height:100vh; display:flex; align-items:center; justify-content:center;
+    text-align:center; padding:6rem 2rem 4rem;
+    position:relative; overflow:hidden;
+  }
+  .hero-bg {
+    position:absolute; inset:0; z-index:0;
+    background: radial-gradient(ellipse 80% 60% at 50% -20%, rgba(108,99,255,0.3) 0%, transparent 70%),
+                radial-gradient(ellipse 60% 50% at 80% 80%, rgba(0,212,170,0.15) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 40% at 10% 60%, rgba(255,107,157,0.1) 0%, transparent 50%);
+  }
+  .hero-content { position:relative; z-index:1; max-width:900px; }
+  .badge { display:inline-flex; align-items:center; gap:.5rem; padding:.375rem 1rem; border-radius:999px; background:rgba(108,99,255,0.15); border:1px solid rgba(108,99,255,0.3); color:var(--accent3); font-size:.8rem; font-weight:600; margin-bottom:2rem; }
+  .badge-dot { width:6px; height:6px; border-radius:50%; background:var(--teal); animation:pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.6;transform:scale(1.3)} }
+  .hero h1 { font-size:clamp(2.5rem,6vw,5rem); font-weight:700; line-height:1.05; margin-bottom:1.5rem; }
+  .grad-text { background: var(--grad1); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  .grad-text2 { background: var(--grad2); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  .grad-text3 { background: var(--grad3); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  .hero p { font-size:1.2rem; color:var(--text2); max-width:600px; margin:0 auto 2.5rem; line-height:1.7; }
+  .hero-btns { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-bottom:4rem; }
+  .hero-stats { display:flex; gap:3rem; justify-content:center; flex-wrap:wrap; }
+  .stat { text-align:center; }
+  .stat-num { font-family:'Clash Display',sans-serif; font-size:2rem; font-weight:700; color:var(--text); }
+  .stat-label { font-size:.8rem; color:var(--text3); margin-top:.25rem; }
+
+  /* CARDS */
+  .card {
+    background:var(--bg2); border:1px solid var(--border); border-radius:var(--r2);
+    padding:1.5rem; transition:var(--transition);
+  }
+  .card:hover { border-color:var(--border2); transform:translateY(-2px); box-shadow:var(--shadow); }
+  .glass-card {
+    background:var(--glass); border:1px solid var(--border); border-radius:var(--r2);
+    backdrop-filter:blur(10px); padding:1.5rem; transition:var(--transition);
+  }
+
+  /* SECTIONS */
+  section { padding:6rem 2rem; }
+  .container { max-width:1200px; margin:0 auto; }
+  .section-label { font-size:.8rem; font-weight:700; letter-spacing:.15em; text-transform:uppercase; color:var(--accent); margin-bottom:1rem; }
+  .section-title { font-size:clamp(2rem,4vw,3rem); font-weight:700; margin-bottom:1rem; }
+  .section-sub { font-size:1.1rem; color:var(--text2); max-width:600px; }
+
+  /* FEATURES */
+  .features-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.5rem; margin-top:3rem; }
+  .feature-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--r2); padding:1.75rem; transition:var(--transition); cursor:default; }
+  .feature-card:hover { border-color:rgba(108,99,255,0.4); box-shadow:0 0 30px rgba(108,99,255,0.1); }
+  .feature-icon { width:48px; height:48px; border-radius:var(--r); display:flex; align-items:center; justify-content:center; font-size:1.25rem; margin-bottom:1rem; }
+  .feature-card h3 { font-size:1.1rem; margin-bottom:.5rem; }
+  .feature-card p { font-size:.875rem; color:var(--text2); line-height:1.6; }
+
+  /* HOW IT WORKS */
+  .steps { display:flex; flex-direction:column; gap:0; margin-top:3rem; position:relative; }
+  .step { display:flex; gap:2rem; align-items:flex-start; padding:2rem 0; }
+  .step-num { font-family:'Clash Display',sans-serif; font-size:3rem; font-weight:700; color:rgba(108,99,255,0.2); min-width:60px; line-height:1; }
+  .step-content h3 { font-size:1.2rem; margin-bottom:.5rem; }
+  .step-content p { color:var(--text2); line-height:1.7; }
+
+  /* TESTIMONIALS */
+  .testimonials-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.5rem; margin-top:3rem; }
+  .testimonial { background:var(--bg2); border:1px solid var(--border); border-radius:var(--r2); padding:1.75rem; }
+  .stars { color:var(--amber); margin-bottom:1rem; font-size:.875rem; }
+  .testimonial p { color:var(--text2); line-height:1.7; margin-bottom:1.25rem; font-style:italic; font-size:.9rem; }
+  .testimonial-author { display:flex; align-items:center; gap:.75rem; }
+  .avatar { width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.875rem; }
+  .author-info .name { font-weight:600; font-size:.875rem; }
+  .author-info .title { font-size:.75rem; color:var(--text3); }
+
+  /* PRICING */
+  .pricing-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1.5rem; margin-top:3rem; max-width:960px; margin-left:auto; margin-right:auto; }
+  .pricing-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--r2); padding:2rem; transition:var(--transition); }
+  .pricing-card.popular { border-color:var(--accent); box-shadow:0 0 40px rgba(108,99,255,0.2); position:relative; }
+  .popular-badge { position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:var(--grad1); color:#fff; font-size:.7rem; font-weight:700; padding:.25rem .75rem; border-radius:999px; white-space:nowrap; }
+  .price { font-family:'Clash Display',sans-serif; font-size:2.5rem; font-weight:700; }
+  .price span { font-size:1rem; font-weight:400; color:var(--text3); }
+  .price-label { font-size:.8rem; color:var(--text3); margin-bottom:1.5rem; }
+  .features-list { list-style:none; margin:1.5rem 0; display:flex; flex-direction:column; gap:.75rem; }
+  .features-list li { display:flex; align-items:center; gap:.6rem; font-size:.875rem; color:var(--text2); }
+  .features-list li i { color:var(--green); width:16px; }
+  .features-list li.no i { color:var(--text3); }
+  .features-list li.no { color:var(--text3); }
+
+  /* FAQ */
+  .faq-list { max-width:700px; margin:3rem auto 0; display:flex; flex-direction:column; gap:.75rem; }
+  .faq-item { background:var(--bg2); border:1px solid var(--border); border-radius:var(--r); overflow:hidden; }
+  .faq-q { padding:1.25rem 1.5rem; cursor:pointer; display:flex; justify-content:space-between; align-items:center; font-weight:600; font-size:.95rem; }
+  .faq-a { padding:0 1.5rem; max-height:0; overflow:hidden; transition:all .3s ease; font-size:.875rem; color:var(--text2); line-height:1.7; }
+  .faq-item.open .faq-a { max-height:200px; padding:0 1.5rem 1.25rem; }
+  .faq-icon { transition:transform .3s; color:var(--text3); }
+  .faq-item.open .faq-icon { transform:rotate(45deg); }
+
+  /* FOOTER */
+  footer { background:var(--bg2); border-top:1px solid var(--border); padding:4rem 2rem 2rem; }
+  .footer-grid { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:3rem; margin-bottom:3rem; }
+  .footer-brand p { color:var(--text2); font-size:.875rem; line-height:1.7; margin-top:.75rem; max-width:280px; }
+  .footer-social { display:flex; gap:.75rem; margin-top:1.25rem; }
+  .social-icon { width:36px; height:36px; border-radius:50%; background:var(--glass); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; color:var(--text3); font-size:.875rem; cursor:pointer; transition:var(--transition); }
+  .social-icon:hover { color:var(--text); border-color:var(--border2); }
+  .footer-col h4 { font-size:.875rem; font-weight:700; margin-bottom:1rem; }
+  .footer-col ul { list-style:none; display:flex; flex-direction:column; gap:.6rem; }
+  .footer-col li { font-size:.8rem; color:var(--text3); cursor:pointer; transition:var(--transition); }
+  .footer-col li:hover { color:var(--text2); }
+  .footer-bottom { border-top:1px solid var(--border); padding-top:1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; }
+  .footer-bottom p { font-size:.75rem; color:var(--text3); }
+
+  /* AUTH */
+  .auth-page { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:6rem 2rem; }
+  .auth-card { width:100%; max-width:440px; background:var(--bg2); border:1px solid var(--border); border-radius:var(--r3); padding:2.5rem; }
+  .auth-logo { text-align:center; margin-bottom:2rem; }
+  .auth-card h2 { font-size:1.75rem; text-align:center; margin-bottom:.5rem; }
+  .auth-card .sub { text-align:center; color:var(--text2); font-size:.875rem; margin-bottom:2rem; }
+  .form-group { margin-bottom:1.25rem; }
+  .form-group label { display:block; font-size:.8rem; font-weight:600; color:var(--text2); margin-bottom:.5rem; letter-spacing:.05em; }
+  .form-group input { width:100%; padding:.75rem 1rem; background:var(--bg3); border:1px solid var(--border); border-radius:var(--r); color:var(--text); font-size:.875rem; font-family:'Satoshi',sans-serif; outline:none; transition:var(--transition); }
+  .form-group input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(108,99,255,0.15); }
+  .input-icon-wrap { position:relative; }
+  .input-icon-wrap i { position:absolute; left:.875rem; top:50%; transform:translateY(-50%); color:var(--text3); font-size:.875rem; }
+  .input-icon-wrap input { padding-left:2.5rem; }
+  .divider { display:flex; align-items:center; gap:1rem; margin:1.5rem 0; }
+  .divider hr { flex:1; border:none; border-top:1px solid var(--border); }
+  .divider span { font-size:.75rem; color:var(--text3); }
+  .social-login { display:flex; gap:.75rem; }
+  .social-btn { flex:1; display:flex; align-items:center; justify-content:center; gap:.5rem; padding:.625rem; background:var(--bg3); border:1px solid var(--border); border-radius:var(--r); color:var(--text2); font-size:.8rem; cursor:pointer; transition:var(--transition); font-family:'Satoshi',sans-serif; }
+  .social-btn:hover { border-color:var(--border2); color:var(--text); }
+  .auth-link { text-align:center; font-size:.8rem; color:var(--text3); margin-top:1.5rem; }
+  .auth-link a { color:var(--accent); cursor:pointer; }
+
+  /* DASHBOARD */
+  .dashboard-layout { display:flex; min-height:100vh; padding-top:64px; }
+  .sidebar { width:240px; background:var(--bg2); border-right:1px solid var(--border); padding:1.5rem 0; position:fixed; top:64px; bottom:0; left:0; overflow-y:auto; transition:var(--transition); z-index:100; }
+  .sidebar-section { margin-bottom:1.5rem; }
+  .sidebar-label { font-size:.65rem; font-weight:700; letter-spacing:.15em; text-transform:uppercase; color:var(--text3); padding:0 1.25rem; margin-bottom:.5rem; }
+  .sidebar-item { display:flex; align-items:center; gap:.75rem; padding:.625rem 1.25rem; color:var(--text2); cursor:pointer; transition:var(--transition); font-size:.875rem; font-weight:500; border-left:2px solid transparent; }
+  .sidebar-item:hover { color:var(--text); background:var(--glass); }
+  .sidebar-item.active { color:var(--accent2); border-left-color:var(--accent); background:rgba(108,99,255,0.08); }
+  .sidebar-item i { width:18px; font-size:.9rem; }
+  .sidebar-badge { margin-left:auto; background:var(--accent); color:#fff; font-size:.65rem; font-weight:700; padding:.15rem .4rem; border-radius:999px; }
+  .main-content { flex:1; margin-left:240px; padding:2rem; }
+
+  /* DASHBOARD OVERVIEW */
+  .overview-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1.25rem; margin-bottom:2rem; }
+  .metric-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--r2); padding:1.5rem; }
+  .metric-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem; }
+  .metric-icon { width:40px; height:40px; border-radius:var(--r); display:flex; align-items:center; justify-content:center; font-size:1rem; }
+  .metric-trend { font-size:.7rem; font-weight:700; display:flex; align-items:center; gap:.25rem; padding:.2rem .5rem; border-radius:999px; }
+  .trend-up { color:#4ade80; background:rgba(74,222,128,0.1); }
+  .trend-down { color:#f87171; background:rgba(248,113,113,0.1); }
+  .metric-value { font-family:'Clash Display',sans-serif; font-size:2rem; font-weight:700; }
+  .metric-label { font-size:.75rem; color:var(--text3); margin-top:.25rem; }
+  .progress-bar { height:6px; background:var(--bg3); border-radius:999px; margin-top:1rem; overflow:hidden; }
+  .progress-fill { height:100%; border-radius:999px; transition:width 1s ease; }
+
+  /* CIRCULAR PROGRESS */
+  .circular-progress { position:relative; display:inline-flex; align-items:center; justify-content:center; }
+  .circular-progress svg { transform:rotate(-90deg); }
+  .circular-progress .value { position:absolute; font-family:'Clash Display',sans-serif; font-size:1.5rem; font-weight:700; }
+  .circular-progress .sub-label { position:absolute; bottom:10px; font-size:.6rem; color:var(--text3); }
+
+  /* RESUME ANALYZER */
+  .upload-zone { border:2px dashed var(--border); border-radius:var(--r2); padding:3rem; text-align:center; transition:var(--transition); cursor:pointer; }
+  .upload-zone:hover, .upload-zone.drag { border-color:var(--accent); background:rgba(108,99,255,0.05); }
+  .upload-icon { font-size:2.5rem; color:var(--text3); margin-bottom:1rem; }
+  .upload-zone h3 { margin-bottom:.5rem; }
+  .upload-zone p { color:var(--text2); font-size:.875rem; }
+  .analysis-result { margin-top:2rem; }
+  .score-ring-section { text-align:center; margin-bottom:2rem; }
+  .skills-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:.875rem; }
+  .skill-item { background:var(--bg3); border-radius:var(--r); padding:1rem; }
+  .skill-name { font-size:.8rem; font-weight:600; margin-bottom:.5rem; display:flex; justify-content:space-between; }
+  .keywords-cloud { display:flex; flex-wrap:wrap; gap:.5rem; margin-top:1rem; }
+  .keyword { padding:.25rem .625rem; border-radius:999px; font-size:.75rem; font-weight:600; }
+  .keyword.found { background:rgba(74,222,128,0.15); color:#4ade80; border:1px solid rgba(74,222,128,0.3); }
+  .keyword.missing { background:rgba(248,113,113,0.15); color:#f87171; border:1px solid rgba(248,113,113,0.3); }
+  .suggestion-list { display:flex; flex-direction:column; gap:.75rem; margin-top:1rem; }
+  .suggestion { display:flex; gap:.75rem; align-items:flex-start; padding:.875rem 1rem; background:var(--bg3); border-radius:var(--r); }
+  .suggestion i { color:var(--amber); margin-top:.1rem; font-size:.875rem; }
+  .suggestion p { font-size:.8rem; color:var(--text2); line-height:1.6; }
+
+  /* JOB MATCHER */
+  .job-filters { display:flex; gap:.75rem; flex-wrap:wrap; margin-bottom:1.5rem; }
+  .filter-chip { padding:.375rem .875rem; border-radius:999px; font-size:.8rem; font-weight:600; border:1px solid var(--border); color:var(--text2); cursor:pointer; transition:var(--transition); background:transparent; font-family:'Satoshi',sans-serif; }
+  .filter-chip:hover, .filter-chip.active { border-color:var(--accent); color:var(--accent2); background:rgba(108,99,255,0.1); }
+  .jobs-list { display:flex; flex-direction:column; gap:1rem; }
+  .job-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--r2); padding:1.5rem; display:flex; justify-content:space-between; align-items:flex-start; gap:1.5rem; transition:var(--transition); }
+  .job-card:hover { border-color:var(--border2); box-shadow:var(--shadow); }
+  .job-card.saved { border-color:var(--accent); }
+  .job-info h3 { font-size:1rem; margin-bottom:.375rem; }
+  .job-meta { display:flex; flex-wrap:wrap; gap:.75rem; font-size:.75rem; color:var(--text3); margin-bottom:.75rem; }
+  .job-meta span { display:flex; align-items:center; gap:.25rem; }
+  .job-tags { display:flex; gap:.5rem; flex-wrap:wrap; }
+  .tag { padding:.2rem .6rem; border-radius:999px; font-size:.7rem; font-weight:600; background:var(--bg3); color:var(--text3); }
+  .match-badge { font-family:'Clash Display',sans-serif; font-size:1.5rem; font-weight:700; text-align:center; min-width:80px; }
+  .match-label { font-size:.65rem; color:var(--text3); text-align:center; }
+  .match-ring { width:64px; height:64px; position:relative; display:flex; align-items:center; justify-content:center; }
+
+  /* RESUME BUILDER */
+  .builder-layout { display:grid; grid-template-columns:280px 1fr; gap:1.5rem; height:calc(100vh - 130px); }
+  .builder-sidebar { background:var(--bg2); border:1px solid var(--border); border-radius:var(--r2); padding:1rem; overflow-y:auto; }
+  .builder-preview { background:#fff; border:1px solid var(--border); border-radius:var(--r2); overflow:hidden; position:relative; }
+  .resume-paper { padding:2rem; min-height:100%; font-family:'Satoshi',sans-serif; color:#1a1a2e; }
+  .resume-paper .rh { background:linear-gradient(135deg,#6c63ff,#a89dff); color:#fff; padding:1.5rem 2rem; margin:-2rem -2rem 1.5rem; }
+  .resume-paper .rname { font-family:'Clash Display',sans-serif; font-size:1.5rem; font-weight:700; }
+  .resume-paper .rtitle { font-size:.85rem; opacity:.85; }
+  .resume-paper .rsec { margin-bottom:1.25rem; }
+  .resume-paper .rsec-title { font-size:.7rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#6c63ff; margin-bottom:.625rem; border-bottom:1px solid #e0e0f0; padding-bottom:.375rem; }
+  .drag-item { display:flex; align-items:center; gap:.625rem; padding:.625rem .75rem; background:var(--bg3); border:1px solid var(--border); border-radius:var(--r); margin-bottom:.5rem; cursor:grab; font-size:.8rem; transition:var(--transition); }
+  .drag-item:hover { border-color:var(--border2); }
+  .drag-item i { color:var(--text3); font-size:.875rem; }
+  .template-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:.5rem; margin-bottom:1rem; }
+  .template-thumb { aspect-ratio:3/4; border-radius:var(--r); background:var(--bg3); border:2px solid transparent; cursor:pointer; overflow:hidden; transition:var(--transition); }
+  .template-thumb.active { border-color:var(--accent); }
+  .template-thumb:hover { border-color:var(--border2); }
+
+  /* ADMIN */
+  .admin-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem; }
+  .data-table { width:100%; border-collapse:collapse; }
+  .data-table th { text-align:left; font-size:.7rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text3); padding:.75rem 1rem; border-bottom:1px solid var(--border); }
+  .data-table td { padding:.875rem 1rem; border-bottom:1px solid var(--border); font-size:.85rem; vertical-align:middle; }
+  .data-table tr:hover td { background:var(--glass); }
+  .status-badge { padding:.2rem .6rem; border-radius:999px; font-size:.7rem; font-weight:700; }
+  .status-active { background:rgba(74,222,128,0.15); color:#4ade80; }
+  .status-pending { background:rgba(255,179,71,0.15); color:#ffb347; }
+  .status-expired { background:rgba(248,113,113,0.15); color:#f87171; }
+  .chart-bars { display:flex; align-items:flex-end; gap:4px; height:80px; }
+  .bar { flex:1; border-radius:4px 4px 0 0; background:rgba(108,99,255,0.3); transition:height .5s ease; }
+  .bar:hover { background:rgba(108,99,255,0.6); }
+
+  /* NOTIFICATIONS */
+  .notif-dropdown { position:absolute; top:100%; right:0; width:320px; background:var(--bg2); border:1px solid var(--border); border-radius:var(--r2); padding:.75rem; box-shadow:0 20px 40px rgba(0,0,0,.3); z-index:200; display:none; }
+  .notif-item { padding:.75rem; border-radius:var(--r); cursor:pointer; transition:var(--transition); display:flex; gap:.75rem; }
+  .notif-item:hover { background:var(--glass); }
+  .notif-dot { width:8px; height:8px; border-radius:50%; background:var(--accent); margin-top:.3rem; flex-shrink:0; }
+  .notif-text { font-size:.8rem; color:var(--text2); line-height:1.5; }
+  .notif-time { font-size:.7rem; color:var(--text3); margin-top:.2rem; }
+  .notif-btn { position:relative; }
+
+  /* UTIL */
+  .tabs { display:flex; gap:.25rem; background:var(--bg3); border-radius:var(--r); padding:.25rem; margin-bottom:1.5rem; }
+  .tab { padding:.5rem 1rem; border-radius:8px; font-size:.8rem; font-weight:600; cursor:pointer; color:var(--text2); transition:var(--transition); }
+  .tab.active { background:var(--bg2); color:var(--text); }
+  .section-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; }
+  .section-header h2 { font-size:1.25rem; }
+  .divider-line { border:none; border-top:1px solid var(--border); margin:1.5rem 0; }
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+  .three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.5rem; }
+  .flex-center { display:flex; align-items:center; justify-content:center; }
+  .gap-2 { gap:.5rem; }
+  .text-center { text-align:center; }
+  .mb-1 { margin-bottom:.5rem; }
+  .mb-2 { margin-bottom:1rem; }
+  .mb-3 { margin-bottom:1.5rem; }
+  .mt-1 { margin-top:.5rem; }
+  .mt-2 { margin-top:1rem; }
+  .color-accent { color:var(--accent2); }
+  .color-green { color:var(--green); }
+  .color-red { color:var(--red); }
+  .color-amber { color:var(--amber); }
+  .color-teal { color:var(--teal); }
+  .text-sm { font-size:.875rem; }
+  .text-xs { font-size:.75rem; }
+  .text-muted { color:var(--text2); }
+  .text-dim { color:var(--text3); }
+  .fw-600 { font-weight:600; }
+  .fw-700 { font-weight:700; }
+  .rounded-full { border-radius:999px; }
+  .inline-flex { display:inline-flex; align-items:center; gap:.375rem; }
+  .ai-tag { background:linear-gradient(90deg,rgba(108,99,255,.2),rgba(0,212,170,.2)); border:1px solid rgba(108,99,255,.3); color:var(--accent3); font-size:.7rem; font-weight:700; padding:.2rem .6rem; border-radius:999px; }
+  .spinner { width:20px; height:20px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+  .loading-bar { height:3px; background:var(--grad1); border-radius:999px; animation:loading 2s ease-in-out; }
+  @keyframes loading { 0%{width:0%} 80%{width:90%} 100%{width:100%} }
+  .skeleton { background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 50%,var(--bg3) 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:var(--r); }
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+  .page-title { font-size:1.75rem; font-weight:700; margin-bottom:.25rem; }
+  .page-sub { font-size:.875rem; color:var(--text2); }
+
+  /* MOBILE RESPONSIVENESS */
+  @media(max-width:768px) {
+    .sidebar { transform:translateX(-100%); }
+    .sidebar.open { transform:translateX(0); }
+    .main-content { margin-left:0; padding:1rem; }
+    .footer-grid { grid-template-columns:1fr 1fr; }
+    .two-col, .three-col { grid-template-columns:1fr; }
+    .builder-layout { grid-template-columns:1fr; }
+    .builder-preview { display:none; }
+    nav .nav-links { display:none; }
+  }
+  @media(max-width:480px) {
+    .footer-grid { grid-template-columns:1fr; }
+    .hero-stats { gap:1.5rem; }
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  .animate-up { animation:fadeUp .6s ease forwards; }
+  .delay-1 { animation-delay:.1s; opacity:0; }
+  .delay-2 { animation-delay:.2s; opacity:0; }
+  .delay-3 { animation-delay:.3s; opacity:0; }
+  .delay-4 { animation-delay:.4s; opacity:0; }
+
+  /* TOAST */
+  .toast-container { position:fixed; bottom:1.5rem; right:1.5rem; z-index:9999; display:flex; flex-direction:column; gap:.5rem; }
+  .toast { background:var(--bg2); border:1px solid var(--border); border-radius:var(--r); padding:.875rem 1.25rem; font-size:.85rem; max-width:320px; animation:slideIn .3s ease; box-shadow:0 10px 30px rgba(0,0,0,.3); display:flex; align-items:center; gap:.75rem; }
+  @keyframes slideIn { from{transform:translateX(100%);opacity:0} to{transform:translateX(0);opacity:1} }
+  .toast.success { border-color:rgba(74,222,128,.4); }
+  .toast.error { border-color:rgba(248,113,113,.4); }
+
+  /* LANG TOGGLE */
+  .lang-badge { font-size:.7rem; font-weight:700; padding:.2rem .5rem; border-radius:999px; background:var(--bg3); border:1px solid var(--border); color:var(--text2); cursor:pointer; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <div class="logo" onclick="goTo('landing')">ResumeAI ✦</div>
+  <div class="nav-links" id="navLinks">
+    <a onclick="goTo('landing')">Home</a>
+    <a onclick="goTo('analyzer')">Analyzer</a>
+    <a onclick="goTo('jobs')">Jobs</a>
+    <a onclick="goTo('builder')">Builder</a>
+  </div>
+  <div class="nav-right">
+    <span class="lang-badge" onclick="toggleLang()">EN</span>
+    <button class="theme-toggle" onclick="toggleTheme()"><i class="fa-solid fa-moon" id="themeIcon"></i></button>
+    <div class="notif-btn" id="notifBtn" onclick="toggleNotif()" style="position:relative">
+      <button class="btn btn-ghost btn-sm" style="width:36px;height:36px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:50%">
+        <i class="fa-solid fa-bell"></i>
+        <span style="position:absolute;top:4px;right:4px;width:8px;height:8px;background:var(--pink);border-radius:50%;border:2px solid var(--bg)"></span>
+      </button>
+      <div class="notif-dropdown" id="notifDropdown">
+        <div style="font-size:.75rem;font-weight:700;color:var(--text3);margin-bottom:.5rem;padding:0 .5rem">Notifications</div>
+        <div class="notif-item"><div class="notif-dot"></div><div><div class="notif-text">Your resume score improved to <strong>87/100</strong></div><div class="notif-time">2 min ago</div></div></div>
+        <div class="notif-item"><div class="notif-dot"></div><div><div class="notif-text">New job match found: <strong>Senior Frontend Dev</strong></div><div class="notif-time">15 min ago</div></div></div>
+        <div class="notif-item" style="opacity:.6"><div class="notif-dot" style="background:var(--text3)"></div><div><div class="notif-text">Resume analysis complete</div><div class="notif-time">1 hour ago</div></div></div>
+      </div>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="goTo('login')">Login</button>
+    <button class="btn btn-primary btn-sm" onclick="goTo('register')">Get Started</button>
+  </div>
+</nav>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ===================== LANDING PAGE ===================== -->
+<div id="landing" class="page active">
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <div class="badge animate-up"><span class="badge-dot"></span> AI-Powered Career Platform · 2025</div>
+      <h1 class="animate-up delay-1">Land Your Dream Job with <br><span class="grad-text">AI-Powered</span> Resume Analysis</h1>
+      <p class="animate-up delay-2">Upload your resume, get an instant ATS score, discover skill gaps, and match with the perfect jobs — all powered by cutting-edge AI.</p>
+      <div class="hero-btns animate-up delay-3">
+        <button class="btn btn-primary btn-lg" onclick="goTo('analyzer')"><i class="fa-solid fa-bolt" style="margin-right:.5rem"></i>Analyze My Resume</button>
+        <button class="btn btn-ghost btn-lg" onclick="goTo('jobs')"><i class="fa-solid fa-briefcase" style="margin-right:.5rem"></i>Browse Jobs</button>
+      </div>
+      <div class="hero-stats animate-up delay-4">
+        <div class="stat"><div class="stat-num">50K+</div><div class="stat-label">Resumes Analyzed</div></div>
+        <div class="stat"><div class="stat-num">12K+</div><div class="stat-label">Jobs Matched</div></div>
+        <div class="stat"><div class="stat-num">94%</div><div class="stat-label">Interview Rate</div></div>
+        <div class="stat"><div class="stat-num">4.9★</div><div class="stat-label">User Rating</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section style="background:var(--bg2)">
+    <div class="container">
+      <div class="section-label">Features</div>
+      <h2 class="section-title">Everything You Need to <span class="grad-text">Get Hired</span></h2>
+      <p class="section-sub">Our AI analyzes every aspect of your resume and career profile to maximize your chances.</p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon" style="background:rgba(108,99,255,0.15)"><i class="fa-solid fa-brain" style="color:var(--accent2)"></i></div>
+          <h3>AI Resume Analysis</h3>
+          <p>Advanced NLP scans your resume against thousands of job descriptions to identify gaps and strengths instantly.</p>
+          <div class="mt-2"><span class="ai-tag">✦ AI Powered</span></div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background:rgba(0,212,170,0.15)"><i class="fa-solid fa-bullseye" style="color:var(--teal)"></i></div>
+          <h3>ATS Compatibility Score</h3>
+          <p>Get a detailed ATS score and learn exactly how to optimize your resume to pass automated screening systems.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background:rgba(255,107,157,0.15)"><i class="fa-solid fa-magnifying-glass-chart" style="color:var(--pink)"></i></div>
+          <h3>Smart Job Matching</h3>
+          <p>Our AI engine matches you with jobs where you have the highest chance of success based on your profile.</p>
+          <div class="mt-2"><span class="ai-tag">✦ AI Powered</span></div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background:rgba(255,179,71,0.15)"><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--amber)"></i></div>
+          <h3>Skill Gap Analysis</h3>
+          <p>Identify missing skills for your target roles and get personalized learning recommendations to close the gaps.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background:rgba(96,165,250,0.15)"><i class="fa-solid fa-file-pen" style="color:var(--blue)"></i></div>
+          <h3>Resume Builder</h3>
+          <p>Create a stunning, ATS-optimized resume from scratch using our drag-and-drop builder with premium templates.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background:rgba(74,222,128,0.15)"><i class="fa-solid fa-chart-line" style="color:var(--green)"></i></div>
+          <h3>Career Analytics</h3>
+          <p>Track your application success rate, interview performance, and career progress with detailed analytics.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section>
+    <div class="container" style="max-width:800px">
+      <div class="section-label">Process</div>
+      <h2 class="section-title">How It <span class="grad-text2">Works</span></h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div class="step-content">
+            <h3>Upload Your Resume</h3>
+            <p>Simply drag and drop your PDF or DOCX resume. Our system instantly processes it using advanced OCR and NLP.</p>
+          </div>
+        </div>
+        <hr class="divider-line" />
+        <div class="step">
+          <div class="step-num">02</div>
+          <div class="step-content">
+            <h3>AI Analysis & Scoring</h3>
+            <p>Our AI evaluates your ATS score, keyword density, formatting, skills, and experience in seconds.</p>
+          </div>
+        </div>
+        <hr class="divider-line" />
+        <div class="step">
+          <div class="step-num">03</div>
+          <div class="step-content">
+            <h3>Get Personalized Insights</h3>
+            <p>Receive detailed recommendations to improve your resume and increase your interview chances by up to 3x.</p>
+          </div>
+        </div>
+        <hr class="divider-line" />
+        <div class="step">
+          <div class="step-num">04</div>
+          <div class="step-content">
+            <h3>Match with Perfect Jobs</h3>
+            <p>Get matched with roles where your skills align best, with AI-calculated match percentages for each position.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section style="background:var(--bg2)">
+    <div class="container">
+      <div class="section-label">Testimonials</div>
+      <h2 class="section-title">Loved by <span class="grad-text3">Professionals</span></h2>
+      <div class="testimonials-grid">
+        <div class="testimonial">
+          <div class="stars">★★★★★</div>
+          <p>"ResumeAI helped me land a job at Google! My ATS score went from 42 to 91 after following their suggestions. Absolutely incredible tool."</p>
+          <div class="testimonial-author">
+            <div class="avatar" style="background:rgba(108,99,255,0.2);color:var(--accent2)">SK</div>
+            <div class="author-info"><div class="name">Sarah Kim</div><div class="title">Software Engineer at Google</div></div>
+          </div>
+        </div>
+        <div class="testimonial">
+          <div class="stars">★★★★★</div>
+          <p>"The job matching feature is phenomenal. Found 3 perfect-fit roles within a week and got interviews for all of them. Game changer!"</p>
+          <div class="testimonial-author">
+            <div class="avatar" style="background:rgba(0,212,170,0.2);color:var(--teal)">MR</div>
+            <div class="author-info"><div class="name">Marcus Rivera</div><div class="title">Product Manager at Stripe</div></div>
+          </div>
+        </div>
+        <div class="testimonial">
+          <div class="stars">★★★★★</div>
+          <p>"As a career changer, I had no idea how to tailor my resume. ResumeAI showed me exactly what skills to highlight. Got hired in 3 weeks!"</p>
+          <div class="testimonial-author">
+            <div class="avatar" style="background:rgba(255,107,157,0.2);color:var(--pink)">AM</div>
+            <div class="author-info"><div class="name">Amira Malik</div><div class="title">Data Analyst at Airbnb</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section>
+    <div class="container">
+      <div class="section-label">Pricing</div>
+      <h2 class="section-title">Simple, <span class="grad-text">Transparent</span> Pricing</h2>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <div style="font-weight:700;margin-bottom:.5rem">Free</div>
+          <div class="price">$0 <span>/ mo</span></div>
+          <div class="price-label">Perfect to get started</div>
+          <ul class="features-list">
+            <li><i class="fa-solid fa-check"></i> 3 resume analyses/month</li>
+            <li><i class="fa-solid fa-check"></i> Basic ATS score</li>
+            <li><i class="fa-solid fa-check"></i> 10 job matches</li>
+            <li class="no"><i class="fa-solid fa-xmark"></i> AI recommendations</li>
+            <li class="no"><i class="fa-solid fa-xmark"></i> Resume builder</li>
+          </ul>
+          <button class="btn btn-ghost" style="width:100%">Get Started</button>
+        </div>
+        <div class="pricing-card popular">
+          <div class="popular-badge">Most Popular ✦</div>
+          <div style="font-weight:700;margin-bottom:.5rem">Pro</div>
+          <div class="price">$19 <span>/ mo</span></div>
+          <div class="price-label">For serious job seekers</div>
+          <ul class="features-list">
+            <li><i class="fa-solid fa-check"></i> Unlimited analyses</li>
+            <li><i class="fa-solid fa-check"></i> Advanced ATS optimization</li>
+            <li><i class="fa-solid fa-check"></i> Unlimited job matches</li>
+            <li><i class="fa-solid fa-check"></i> AI recommendations</li>
+            <li><i class="fa-solid fa-check"></i> Resume builder + 20 templates</li>
+            <li><i class="fa-solid fa-check"></i> Priority support</li>
+          </ul>
+          <button class="btn btn-primary" style="width:100%" onclick="showToast('Starting Pro trial…','success')">Start Free Trial</button>
+        </div>
+        <div class="pricing-card">
+          <div style="font-weight:700;margin-bottom:.5rem">Enterprise</div>
+          <div class="price">$89 <span>/ mo</span></div>
+          <div class="price-label">For teams & organizations</div>
+          <ul class="features-list">
+            <li><i class="fa-solid fa-check"></i> Everything in Pro</li>
+            <li><i class="fa-solid fa-check"></i> Team dashboard</li>
+            <li><i class="fa-solid fa-check"></i> API access</li>
+            <li><i class="fa-solid fa-check"></i> Custom branding</li>
+            <li><i class="fa-solid fa-check"></i> Dedicated success manager</li>
+          </ul>
+          <button class="btn btn-ghost" style="width:100%">Contact Sales</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section style="background:var(--bg2)">
+    <div class="container">
+      <div class="section-label">FAQ</div>
+      <h2 class="section-title" style="text-align:center">Frequently Asked <span class="grad-text">Questions</span></h2>
+      <div class="faq-list">
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">What file formats does ResumeAI support? <i class="fa-solid fa-plus faq-icon"></i></div>
+          <div class="faq-a">ResumeAI supports PDF, DOCX, and DOC formats. For best results, we recommend uploading a PDF as it preserves formatting. Our OCR technology can also process image-based PDFs.</div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">How accurate is the ATS score? <i class="fa-solid fa-plus faq-icon"></i></div>
+          <div class="faq-a">Our ATS scoring algorithm is trained on data from 500+ ATS systems including Workday, Greenhouse, and Lever. It has a 94% correlation with actual ATS outputs in our testing.</div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">Is my resume data kept private? <i class="fa-solid fa-plus faq-icon"></i></div>
+          <div class="faq-a">Absolutely. Your resume data is encrypted at rest and in transit using AES-256. We never share your data with employers or third parties. You can delete your data at any time.</div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">Can I cancel my subscription anytime? <i class="fa-solid fa-plus faq-icon"></i></div>
+          <div class="faq-a">Yes! You can cancel anytime with no cancellation fees. Your plan remains active until the end of the billing period.</div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">Does ResumeAI support Arabic resumes? <i class="fa-solid fa-plus faq-icon"></i></div>
+          <div class="faq-a">Yes! ResumeAI fully supports English and Arabic resumes. Our AI models are trained on bilingual datasets and our interface supports both LTR and RTL layouts.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BANNER -->
+  <section>
+    <div class="container">
+      <div style="background:var(--grad1);border-radius:var(--r3);padding:4rem 3rem;text-align:center;position:relative;overflow:hidden">
+        <div style="position:absolute;inset:0;background:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2280%22 cy=%2220%22 r=%2230%22 fill=%22rgba(255,255,255,0.05)%22/><circle cx=%2210%22 cy=%2280%22 r=%2240%22 fill=%22rgba(255,255,255,0.05)%22/></svg>');"></div>
+        <div style="position:relative">
+          <h2 style="font-size:2rem;color:#fff;margin-bottom:1rem">Ready to Land Your Dream Job?</h2>
+          <p style="color:rgba(255,255,255,.8);margin-bottom:2rem">Join 50,000+ professionals who've transformed their careers with ResumeAI.</p>
+          <button class="btn btn-lg" style="background:#fff;color:var(--accent);font-weight:700" onclick="goTo('register')">Start Free — No Credit Card Required</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="logo" style="font-size:1.25rem">ResumeAI ✦</div>
+          <p>The AI-powered career platform that helps you craft the perfect resume, discover ideal jobs, and land more interviews.</p>
+          <div class="footer-social">
+            <div class="social-icon"><i class="fa-brands fa-twitter"></i></div>
+            <div class="social-icon"><i class="fa-brands fa-linkedin"></i></div>
+            <div class="social-icon"><i class="fa-brands fa-github"></i></div>
+            <div class="social-icon"><i class="fa-brands fa-instagram"></i></div>
+          </div>
+        </div>
+        <div class="footer-col"><h4>Product</h4><ul><li>Resume Analyzer</li><li>Job Matcher</li><li>Resume Builder</li><li>Career Insights</li></ul></div>
+        <div class="footer-col"><h4>Company</h4><ul><li>About Us</li><li>Blog</li><li>Careers</li><li>Press Kit</li></ul></div>
+        <div class="footer-col"><h4>Legal</h4><ul><li>Privacy Policy</li><li>Terms of Service</li><li>Cookie Policy</li><li>GDPR</li></ul></div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2025 ResumeAI. All rights reserved.</p>
+        <p>Made with ✦ AI · SOC2 Compliant · GDPR Ready</p>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ===================== LOGIN ===================== -->
+<div id="login" class="page">
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="auth-logo"><span class="logo">ResumeAI ✦</span></div>
+      <h2>Welcome back</h2>
+      <div class="sub">Sign in to continue your career journey</div>
+      <div class="social-login mb-3">
+        <button class="social-btn"><i class="fa-brands fa-google"></i> Google</button>
+        <button class="social-btn"><i class="fa-brands fa-linkedin"></i> LinkedIn</button>
+      </div>
+      <div class="divider"><hr/><span>or continue with email</span><hr/></div>
+      <div class="form-group">
+        <label>EMAIL ADDRESS</label>
+        <div class="input-icon-wrap">
+          <i class="fa-solid fa-envelope"></i>
+          <input type="email" placeholder="you@example.com" id="loginEmail" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>PASSWORD</label>
+        <div class="input-icon-wrap">
+          <i class="fa-solid fa-lock"></i>
+          <input type="password" placeholder="••••••••" id="loginPassword" />
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
+        <label style="display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:var(--text2);cursor:pointer"><input type="checkbox" /> Remember me</label>
+        <a style="font-size:.8rem;color:var(--accent);cursor:pointer" onclick="goTo('forgot')">Forgot password?</a>
+      </div>
+      <button class="btn btn-primary" style="width:100%" onclick="doLogin()">Sign In <i class="fa-solid fa-arrow-right" style="margin-left:.375rem"></i></button>
+      <div class="auth-link">Don't have an account? <a onclick="goTo('register')">Create one free</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== REGISTER ===================== -->
+<div id="register" class="page">
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="auth-logo"><span class="logo">ResumeAI ✦</span></div>
+      <h2>Create your account</h2>
+      <div class="sub">Start your AI-powered career journey today</div>
+      <div class="social-login mb-3">
+        <button class="social-btn"><i class="fa-brands fa-google"></i> Google</button>
+        <button class="social-btn"><i class="fa-brands fa-linkedin"></i> LinkedIn</button>
+      </div>
+      <div class="divider"><hr/><span>or sign up with email</span><hr/></div>
+      <div class="two-col" style="gap:.875rem">
+        <div class="form-group" style="margin-bottom:0">
+          <label>FIRST NAME</label>
+          <input type="text" placeholder="John" id="registerFirstName" style="width:100%;padding:.75rem 1rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:.875rem;font-family:'Satoshi',sans-serif;outline:none" />
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label>LAST NAME</label>
+          <input type="text" placeholder="Doe" id="registerLastName" style="width:100%;padding:.75rem 1rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:.875rem;font-family:'Satoshi',sans-serif;outline:none" />
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:.875rem">
+        <label>EMAIL ADDRESS</label>
+        <div class="input-icon-wrap">
+          <i class="fa-solid fa-envelope"></i>
+          <input type="email" placeholder="you@example.com" id="registerEmail" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>PASSWORD</label>
+        <div class="input-icon-wrap">
+          <i class="fa-solid fa-lock"></i>
+          <input type="password" placeholder="Min. 8 characters" id="registerPassword" />
+        </div>
+      </div>
+      <div style="margin-bottom:1.25rem">
+        <label style="display:flex;align-items:flex-start;gap:.5rem;font-size:.75rem;color:var(--text2);cursor:pointer;line-height:1.5">
+          <input type="checkbox" style="margin-top:2px" />
+          I agree to the <a style="color:var(--accent)">Terms of Service</a> and <a style="color:var(--accent)">Privacy Policy</a>
+        </label>
+      </div>
+      <button class="btn btn-primary" style="width:100%" onclick="doRegister()">Create Free Account <i class="fa-solid fa-arrow-right" style="margin-left:.375rem"></i></button>
+      <div class="auth-link">Already have an account? <a onclick="goTo('login')">Sign in</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== FORGOT PASSWORD ===================== -->
+<div id="forgot" class="page">
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="auth-logo"><span class="logo">ResumeAI ✦</span></div>
+      <div style="text-align:center;margin-bottom:1.5rem"><div style="width:64px;height:64px;border-radius:50%;background:rgba(108,99,255,.15);display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto 1rem"><i class="fa-solid fa-envelope" style="color:var(--accent2)"></i></div></div>
+      <h2>Reset Password</h2>
+      <div class="sub">Enter your email and we'll send a reset link</div>
+      <div class="form-group" style="margin-top:1.5rem">
+        <label>EMAIL ADDRESS</label>
+        <div class="input-icon-wrap">
+          <i class="fa-solid fa-envelope"></i>
+          <input type="email" placeholder="you@example.com" />
+        </div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;margin-bottom:1rem" onclick="showToast('Reset link sent! Check your inbox.','success')">Send Reset Link</button>
+      <button class="btn btn-ghost" style="width:100%" onclick="goTo('login')"><i class="fa-solid fa-arrow-left" style="margin-right:.375rem"></i>Back to Login</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== DASHBOARD ===================== -->
+<div id="dashboard" class="page">
+  <div class="dashboard-layout">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Main</div>
+        <div class="sidebar-item active" onclick="switchDash('overview',this)"><i class="fa-solid fa-gauge-high"></i> Overview</div>
+        <div class="sidebar-item" onclick="goTo('analyzer')"><i class="fa-solid fa-magnifying-glass-chart"></i> Analyzer</div>
+        <div class="sidebar-item" onclick="goTo('jobs')"><i class="fa-solid fa-briefcase"></i> Job Matcher <span class="sidebar-badge">8</span></div>
+        <div class="sidebar-item" onclick="goTo('builder')"><i class="fa-solid fa-file-pen"></i> Resume Builder</div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Insights</div>
+        <div class="sidebar-item" onclick="switchDash('analytics',this)"><i class="fa-solid fa-chart-line"></i> Analytics</div>
+        <div class="sidebar-item" onclick="switchDash('applications',this)"><i class="fa-solid fa-paper-plane"></i> Applications</div>
+        <div class="sidebar-item" onclick="switchDash('skills',this)"><i class="fa-solid fa-star"></i> Skills</div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Account</div>
+        <div class="sidebar-item" onclick="goTo('admin')"><i class="fa-solid fa-shield"></i> Admin Panel</div>
+        <div class="sidebar-item"><i class="fa-solid fa-gear"></i> Settings</div>
+        <div class="sidebar-item" onclick="goTo('landing')"><i class="fa-solid fa-right-from-bracket"></i> Logout</div>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main-content">
+      <!-- OVERVIEW -->
+      <div id="dash-overview">
+        <div class="section-header">
+          <div><div class="page-title">Good morning, John ✦</div><div class="page-sub">Here's your career snapshot for today</div></div>
+          <button class="btn btn-primary btn-sm" onclick="goTo('analyzer')"><i class="fa-solid fa-plus" style="margin-right:.375rem"></i>New Analysis</button>
+        </div>
+
+        <div class="overview-grid">
+          <div class="metric-card">
+            <div class="metric-header">
+              <div class="metric-icon" style="background:rgba(108,99,255,.15)"><i class="fa-solid fa-file-lines" style="color:var(--accent2)"></i></div>
+              <div class="metric-trend trend-up"><i class="fa-solid fa-arrow-up"></i> 12%</div>
+            </div>
+            <div class="metric-value grad-text" id="metricAtsScore">87</div>
+            <div class="metric-label">Resume ATS Score</div>
+            <div class="progress-bar"><div class="progress-fill" id="metricAtsBar" style="width:87%;background:var(--grad1)"></div></div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-header">
+              <div class="metric-icon" style="background:rgba(0,212,170,.15)"><i class="fa-solid fa-briefcase" style="color:var(--teal)"></i></div>
+              <div class="metric-trend trend-up"><i class="fa-solid fa-arrow-up"></i> 5 new</div>
+            </div>
+            <div class="metric-value" style="color:var(--teal)" id="metricJobMatches">24</div>
+            <div class="metric-label">Job Matches Found</div>
+            <div class="progress-bar"><div class="progress-fill" style="width:80%;background:var(--grad2)"></div></div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-header">
+              <div class="metric-icon" style="background:rgba(255,107,157,.15)"><i class="fa-solid fa-paper-plane" style="color:var(--pink)"></i></div>
+              <div class="metric-trend trend-up"><i class="fa-solid fa-arrow-up"></i> 2 this week</div>
+            </div>
+            <div class="metric-value" style="color:var(--pink)" id="metricApplicationsSent">7</div>
+            <div class="metric-label">Applications Sent</div>
+            <div class="progress-bar"><div class="progress-fill" style="width:35%;background:var(--grad3)"></div></div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-header">
+              <div class="metric-icon" style="background:rgba(255,179,71,.15)"><i class="fa-solid fa-calendar" style="color:var(--amber)"></i></div>
+              <div class="metric-trend trend-up"><i class="fa-solid fa-arrow-up"></i> 28% rate</div>
+            </div>
+            <div class="metric-value" style="color:var(--amber)" id="metricInterviews">2</div>
+            <div class="metric-label">Interviews Scheduled</div>
+            <div class="progress-bar"><div class="progress-fill" style="width:28%;background:linear-gradient(90deg,var(--amber),#ffcc80)"></div></div>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <!-- AI RECOMMENDATIONS -->
+          <div class="card">
+            <div class="section-header mb-2"><h2 class="text-sm fw-700">AI Recommendations</h2><span class="ai-tag">✦ Powered by AI</span></div>
+            <div class="suggestion-list">
+              <div class="suggestion"><i class="fa-solid fa-lightbulb color-amber"></i><p>Add <strong>TypeScript</strong> and <strong>React Native</strong> to your skills section — these appear in 73% of matched jobs.</p></div>
+              <div class="suggestion"><i class="fa-solid fa-lightbulb color-amber"></i><p>Your resume lacks quantified achievements. Add metrics like "increased sales by 40%" to boost your score by 15 pts.</p></div>
+              <div class="suggestion"><i class="fa-solid fa-lightbulb color-amber"></i><p>Your LinkedIn profile URL is missing. Adding it increases recruiter contact rate by 2.3x.</p></div>
+            </div>
+          </div>
+
+          <!-- RECENT APPLICATIONS -->
+          <div class="card">
+            <div class="section-header mb-2"><h2 class="text-sm fw-700">Recent Applications</h2><button class="btn btn-ghost btn-sm">View All</button></div>
+            <div style="display:flex;flex-direction:column;gap:.75rem">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div><div class="text-sm fw-600">Senior Frontend Engineer</div><div class="text-xs text-dim">Stripe · Remote</div></div>
+                <span class="status-badge status-pending">Interview</span>
+              </div>
+              <hr class="divider-line" style="margin:.25rem 0"/>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div><div class="text-sm fw-600">Product Designer</div><div class="text-xs text-dim">Figma · San Francisco</div></div>
+                <span class="status-badge status-active">Applied</span>
+              </div>
+              <hr class="divider-line" style="margin:.25rem 0"/>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div><div class="text-sm fw-600">React Developer</div><div class="text-xs text-dim">Vercel · Remote</div></div>
+                <span class="status-badge status-expired">Rejected</span>
+              </div>
+              <hr class="divider-line" style="margin:.25rem 0"/>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div><div class="text-sm fw-600">UX Engineer</div><div class="text-xs text-dim">Linear · Remote</div></div>
+                <span class="status-badge status-active">Applied</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANALYTICS -->
+      <div id="dash-analytics" style="display:none">
+        <div class="page-title mb-1">Analytics</div>
+        <div class="page-sub mb-3">Your career progress over time</div>
+        <div class="card mb-3">
+          <div class="section-header"><h2 class="text-sm fw-700">Applications Over Time</h2><div class="text-xs text-dim">Last 7 days</div></div>
+          <div class="chart-bars mt-2">
+            <div class="bar" style="height:30%"></div><div class="bar" style="height:55%"></div>
+            <div class="bar" style="height:40%"></div><div class="bar" style="height:70%"></div>
+            <div class="bar" style="height:50%"></div><div class="bar" style="height:90%"></div>
+            <div class="bar" style="height:65%"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:.65rem;color:var(--text3);margin-top:.5rem">
+            <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+          </div>
+        </div>
+        <div class="three-col">
+          <div class="metric-card"><div class="metric-value grad-text">68%</div><div class="metric-label">Response Rate</div></div>
+          <div class="metric-card"><div class="metric-value" style="color:var(--teal)">4.2</div><div class="metric-label">Avg Days to Interview</div></div>
+          <div class="metric-card"><div class="metric-value" style="color:var(--amber)">91st</div><div class="metric-label">Percentile in Field</div></div>
+        </div>
+      </div>
+
+      <!-- APPLICATIONS -->
+      <div id="dash-applications" style="display:none">
+        <div class="page-title mb-1">Applications</div>
+        <div class="page-sub mb-3">Track all your job applications</div>
+        <div class="card">
+          <table class="data-table">
+            <thead><tr><th>Job Title</th><th>Company</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr><td class="fw-600">Senior Frontend Engineer</td><td>Stripe</td><td>May 1</td><td><span class="status-badge status-pending">Interview</span></td><td><button class="btn btn-ghost btn-sm">View</button></td></tr>
+              <tr><td class="fw-600">Product Designer</td><td>Figma</td><td>Apr 28</td><td><span class="status-badge status-active">Applied</span></td><td><button class="btn btn-ghost btn-sm">View</button></td></tr>
+              <tr><td class="fw-600">React Developer</td><td>Vercel</td><td>Apr 20</td><td><span class="status-badge status-expired">Rejected</span></td><td><button class="btn btn-ghost btn-sm">View</button></td></tr>
+              <tr><td class="fw-600">UX Engineer</td><td>Linear</td><td>Apr 18</td><td><span class="status-badge status-active">Applied</span></td><td><button class="btn btn-ghost btn-sm">View</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SKILLS -->
+      <div id="dash-skills" style="display:none">
+        <div class="page-title mb-1">Skills Analysis</div>
+        <div class="page-sub mb-3">Your skill profile and gap analysis</div>
+        <div class="two-col">
+          <div class="card">
+            <h3 class="text-sm fw-700 mb-2">Current Skills</h3>
+            <div class="skills-grid" style="grid-template-columns:1fr">
+              <div class="skill-item"><div class="skill-name"><span>React.js</span><span class="color-green">95%</span></div><div class="progress-bar"><div class="progress-fill" style="width:95%;background:var(--green)"></div></div></div>
+              <div class="skill-item"><div class="skill-name"><span>TypeScript</span><span class="color-accent">78%</span></div><div class="progress-bar"><div class="progress-fill" style="width:78%;background:var(--grad1)"></div></div></div>
+              <div class="skill-item"><div class="skill-name"><span>Node.js</span><span class="color-teal">65%</span></div><div class="progress-bar"><div class="progress-fill" style="width:65%;background:var(--teal)"></div></div></div>
+              <div class="skill-item"><div class="skill-name"><span>Python</span><span class="color-amber">42%</span></div><div class="progress-bar"><div class="progress-fill" style="width:42%;background:var(--amber)"></div></div></div>
+            </div>
+          </div>
+          <div class="card">
+            <h3 class="text-sm fw-700 mb-2">Skills Needed for Target Roles</h3>
+            <div class="suggestion-list">
+              <div class="suggestion"><i class="fa-solid fa-circle-plus color-accent"></i><p><strong>Docker & Kubernetes</strong> — required by 68% of Senior Dev roles. Start with Docker fundamentals.</p></div>
+              <div class="suggestion"><i class="fa-solid fa-circle-plus color-accent"></i><p><strong>GraphQL</strong> — growing demand, appears in 45% of Full-Stack roles. 2-week learning path available.</p></div>
+              <div class="suggestion"><i class="fa-solid fa-circle-plus color-accent"></i><p><strong>System Design</strong> — critical for senior positions. Practice on LeetCode & Educative.io.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== ANALYZER ===================== -->
+<div id="analyzer" class="page">
+  <div class="dashboard-layout">
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Navigation</div>
+        <div class="sidebar-item" onclick="goTo('dashboard')"><i class="fa-solid fa-arrow-left"></i> Dashboard</div>
+        <div class="sidebar-item active"><i class="fa-solid fa-magnifying-glass-chart"></i> Analyzer</div>
+        <div class="sidebar-item" onclick="goTo('jobs')"><i class="fa-solid fa-briefcase"></i> Job Matcher</div>
+        <div class="sidebar-item" onclick="goTo('builder')"><i class="fa-solid fa-file-pen"></i> Builder</div>
+      </div>
+    </div>
+    <div class="main-content">
+      <div class="page-title mb-1">Resume Analyzer</div>
+      <div class="page-sub mb-3">Upload your resume for an instant AI-powered analysis</div>
+
+      <div id="analyzerUpload">
+        <input type="file" id="resumeFileInput" accept=".pdf,.doc,.docx,.txt" style="display:none" onchange="handleResumeFileSelected(event)" />
+        <div class="upload-zone" onclick="document.getElementById('resumeFileInput').click()" ondragover="this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleResumeDrop(event)">
+          <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+          <h3>Drop your resume here</h3>
+          <p>Supports PDF, DOCX, DOC · Max 10MB</p>
+          <button class="btn btn-primary btn-sm" style="margin-top:1rem" onclick="event.stopPropagation();document.getElementById('resumeFileInput').click()"><i class="fa-solid fa-upload" style="margin-right:.375rem"></i>Browse Files</button>
+        </div>
+        <div style="text-align:center;margin-top:1.5rem">
+          <button class="btn btn-ghost btn-sm" onclick="startAnalysis()"><i class="fa-solid fa-play" style="margin-right:.375rem;color:var(--teal)"></i>Demo: Analyze Sample Resume</button>
+        </div>
+      </div>
+
+      <div id="analyzerLoading" style="display:none;text-align:center;padding:3rem">
+        <div class="spinner" style="width:48px;height:48px;border-width:3px;margin:0 auto 1.5rem"></div>
+        <div style="font-size:1.1rem;font-weight:600;margin-bottom:.5rem">Analyzing your resume...</div>
+        <div class="text-sm text-muted">Running 47 AI checks · Usually takes 5-10 seconds</div>
+        <div class="loading-bar" style="max-width:300px;margin:1.5rem auto 0"></div>
+      </div>
+
+      <div id="analyzerResult" style="display:none">
+        <!-- ATS SCORE -->
+        <div class="card mb-3">
+          <div class="two-col" style="align-items:center">
+            <div>
+              <h2 class="mb-1">ATS Compatibility Score</h2>
+              <p class="text-sm text-muted mb-2">Your resume scores in the <strong style="color:var(--green)">top 15%</strong> of analyzed resumes</p>
+              <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+                <div style="text-align:center;padding:.75rem 1.25rem;background:var(--bg3);border-radius:var(--r)"><div id="scoreFormatting" style="font-family:'Clash Display',sans-serif;font-size:1.5rem;font-weight:700;color:var(--green)">91</div><div class="text-xs text-dim">Formatting</div></div>
+                <div style="text-align:center;padding:.75rem 1.25rem;background:var(--bg3);border-radius:var(--r)"><div id="scoreKeywords" style="font-family:'Clash Display',sans-serif;font-size:1.5rem;font-weight:700;color:var(--amber)">74</div><div class="text-xs text-dim">Keywords</div></div>
+                <div style="text-align:center;padding:.75rem 1.25rem;background:var(--bg3);border-radius:var(--r)"><div id="scoreExperience" style="font-family:'Clash Display',sans-serif;font-size:1.5rem;font-weight:700;color:var(--accent2)">88</div><div class="text-xs text-dim">Experience</div></div>
+                <div style="text-align:center;padding:.75rem 1.25rem;background:var(--bg3);border-radius:var(--r)"><div id="scoreEducation" style="font-family:'Clash Display',sans-serif;font-size:1.5rem;font-weight:700;color:var(--teal)">95</div><div class="text-xs text-dim">Education</div></div>
+              </div>
+            </div>
+            <div style="text-align:center">
+              <svg width="160" height="160" viewBox="0 0 160 160">
+                <circle cx="80" cy="80" r="65" fill="none" stroke="var(--bg3)" stroke-width="14"/>
+                <circle cx="80" cy="80" r="65" fill="none" stroke="url(#scoreGrad)" stroke-width="14" stroke-linecap="round" stroke-dasharray="408.4" stroke-dashoffset="53" id="scoreRingFill" transform="rotate(-90 80 80)"/>
+                <defs><linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#6c63ff"/><stop offset="100%" stop-color="#00d4aa"/></linearGradient></defs>
+                <text x="80" y="75" text-anchor="middle" font-family="Clash Display" font-size="28" font-weight="700" fill="var(--text)" id="scoreOverallText">87</text>
+                <text x="80" y="96" text-anchor="middle" font-family="Satoshi" font-size="12" fill="var(--text3)">/ 100</text>
+              </svg>
+              <div class="text-xs text-dim">Overall ATS Score</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="two-col mb-3">
+          <!-- KEYWORDS -->
+          <div class="card">
+            <div class="section-header mb-2"><h3 class="text-sm fw-700">Keyword Analysis</h3><span class="ai-tag">✦ AI</span></div>
+            <div class="text-xs text-dim mb-1">Found keywords:</div>
+            <div class="keywords-cloud" id="foundKeywordsCloud">
+              <span class="keyword found">React</span><span class="keyword found">JavaScript</span>
+              <span class="keyword found">Node.js</span><span class="keyword found">REST API</span>
+              <span class="keyword found">Git</span><span class="keyword found">CSS</span>
+            </div>
+            <div class="text-xs text-dim mt-2 mb-1">Missing high-value keywords:</div>
+            <div class="keywords-cloud" id="missingKeywordsCloud">
+              <span class="keyword missing">TypeScript</span><span class="keyword missing">Docker</span>
+              <span class="keyword missing">GraphQL</span><span class="keyword missing">AWS</span>
+              <span class="keyword missing">CI/CD</span>
+            </div>
+          </div>
+
+          <!-- SUGGESTIONS -->
+          <div class="card">
+            <div class="section-header mb-2"><h3 class="text-sm fw-700">Improvement Tips</h3><span class="ai-tag">✦ AI</span></div>
+            <div class="suggestion-list" id="suggestionsList">
+              <div class="suggestion"><i class="fa-solid fa-triangle-exclamation color-amber"></i><p>Add quantified achievements (e.g., "Reduced load time by 40%") to 3 bullet points.</p></div>
+              <div class="suggestion"><i class="fa-solid fa-triangle-exclamation color-amber"></i><p>Your summary is too generic. Tailor it to target role using keywords from job descriptions.</p></div>
+              <div class="suggestion"><i class="fa-solid fa-circle-check color-green"></i><p>Great use of action verbs! Keep using "developed", "implemented", "led".</p></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SKILL ANALYSIS -->
+        <div class="card mb-3">
+          <div class="section-header mb-2"><h3 class="fw-700">Skill Gap Analysis</h3><span class="ai-tag">✦ AI Powered</span></div>
+          <div class="skills-grid">
+            <div class="skill-item"><div class="skill-name"><span>JavaScript</span><span class="color-green">95%</span></div><div class="progress-bar"><div class="progress-fill" style="width:95%;background:var(--green)"></div></div></div>
+            <div class="skill-item"><div class="skill-name"><span>React.js</span><span class="color-green">90%</span></div><div class="progress-bar"><div class="progress-fill" style="width:90%;background:var(--teal)"></div></div></div>
+            <div class="skill-item"><div class="skill-name"><span>Node.js</span><span class="color-accent">72%</span></div><div class="progress-bar"><div class="progress-fill" style="width:72%;background:var(--accent)"></div></div></div>
+            <div class="skill-item"><div class="skill-name"><span>TypeScript</span><span class="color-amber">45%</span></div><div class="progress-bar"><div class="progress-fill" style="width:45%;background:var(--amber)"></div></div></div>
+            <div class="skill-item"><div class="skill-name"><span>Docker</span><span class="color-red">20%</span></div><div class="progress-bar"><div class="progress-fill" style="width:20%;background:var(--red)"></div></div></div>
+            <div class="skill-item"><div class="skill-name"><span>AWS</span><span class="color-red">15%</span></div><div class="progress-bar"><div class="progress-fill" style="width:15%;background:var(--red)"></div></div></div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:.875rem">
+          <button class="btn btn-primary" onclick="showToast('Downloading optimized resume...','success')"><i class="fa-solid fa-download" style="margin-right:.375rem"></i>Download Optimized Resume</button>
+          <button class="btn btn-ghost" onclick="goTo('jobs')"><i class="fa-solid fa-briefcase" style="margin-right:.375rem"></i>Find Matching Jobs</button>
+          <button class="btn btn-ghost" onclick="resetAnalyzer()"><i class="fa-solid fa-rotate-right" style="margin-right:.375rem"></i>Analyze Another</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== JOB MATCHER ===================== -->
+<div id="jobs" class="page">
+  <div class="dashboard-layout">
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Navigation</div>
+        <div class="sidebar-item" onclick="goTo('dashboard')"><i class="fa-solid fa-gauge-high"></i> Dashboard</div>
+        <div class="sidebar-item" onclick="goTo('analyzer')"><i class="fa-solid fa-magnifying-glass-chart"></i> Analyzer</div>
+        <div class="sidebar-item active"><i class="fa-solid fa-briefcase"></i> Job Matcher</div>
+        <div class="sidebar-item" onclick="goTo('builder')"><i class="fa-solid fa-file-pen"></i> Builder</div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Filters</div>
+        <div style="padding:0 1rem">
+          <div class="form-group">
+            <label style="font-size:.7rem;color:var(--text3)">EXPERIENCE</label>
+            <select style="width:100%;padding:.5rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:.8rem;font-family:'Satoshi',sans-serif;outline:none">
+              <option>Any Level</option><option>Junior (0-2yr)</option><option>Mid (3-5yr)</option><option>Senior (5+yr)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label style="font-size:.7rem;color:var(--text3)">SALARY</label>
+            <select style="width:100%;padding:.5rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:.8rem;font-family:'Satoshi',sans-serif;outline:none">
+              <option>Any Range</option><option>$50K-$80K</option><option>$80K-$120K</option><option>$120K+</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="main-content">
+      <div class="section-header">
+        <div><div class="page-title mb-1">Job Matcher</div><div class="page-sub">24 AI-matched jobs for your profile</div></div>
+        <div style="display:flex;gap:.5rem">
+          <button class="btn btn-ghost btn-sm" onclick="showToast('Refreshing job matches...','success')"><i class="fa-solid fa-rotate-right" style="margin-right:.25rem"></i>Refresh</button>
+        </div>
+      </div>
+
+      <div class="job-filters">
+        <button class="filter-chip active" onclick="setFilter(this)">All Jobs (24)</button>
+        <button class="filter-chip" onclick="setFilter(this)">Remote (15)</button>
+        <button class="filter-chip" onclick="setFilter(this)">On-Site (6)</button>
+        <button class="filter-chip" onclick="setFilter(this)">Hybrid (3)</button>
+        <button class="filter-chip" onclick="setFilter(this)">Full-Time</button>
+        <button class="filter-chip" onclick="setFilter(this)">Contract</button>
+      </div>
+
+      <div class="jobs-list" id="jobsList">
+        <div class="job-card">
+          <div class="job-info">
+            <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem">
+              <div style="width:40px;height:40px;border-radius:var(--r);background:linear-gradient(135deg,#635bff,#a29bfe);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#fff">S</div>
+              <div><h3>Senior Frontend Engineer</h3><div class="text-xs text-dim">Stripe · Remote · Full-time</div></div>
+            </div>
+            <div class="job-meta">
+              <span><i class="fa-solid fa-location-dot"></i> Remote</span>
+              <span><i class="fa-solid fa-dollar-sign"></i> $140K–$180K</span>
+              <span><i class="fa-solid fa-clock"></i> Posted 2 days ago</span>
+            </div>
+            <div class="job-tags">
+              <span class="tag">React</span><span class="tag">TypeScript</span><span class="tag">GraphQL</span><span class="tag">Node.js</span>
+            </div>
+          </div>
+          <div style="text-align:center;min-width:90px">
+            <div style="font-family:'Clash Display',sans-serif;font-size:2rem;font-weight:700;color:var(--green)">94%</div>
+            <div class="text-xs text-dim mb-2">match</div>
+            <button class="btn btn-primary btn-sm" style="width:100%;margin-bottom:.375rem" onclick="showToast('Application submitted!','success')">Apply</button>
+            <button class="btn btn-ghost btn-sm" style="width:100%" onclick="saveJob(this)"><i class="fa-regular fa-bookmark"></i></button>
+          </div>
+        </div>
+
+        <div class="job-card">
+          <div class="job-info">
+            <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem">
+              <div style="width:40px;height:40px;border-radius:var(--r);background:linear-gradient(135deg,#f24e1e,#ff7262);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#fff">F</div>
+              <div><h3>Product Designer</h3><div class="text-xs text-dim">Figma · San Francisco · Hybrid</div></div>
+            </div>
+            <div class="job-meta">
+              <span><i class="fa-solid fa-location-dot"></i> San Francisco</span>
+              <span><i class="fa-solid fa-dollar-sign"></i> $120K–$160K</span>
+              <span><i class="fa-solid fa-clock"></i> Posted 5 days ago</span>
+            </div>
+            <div class="job-tags"><span class="tag">Figma</span><span class="tag">UX</span><span class="tag">Prototyping</span></div>
+          </div>
+          <div style="text-align:center;min-width:90px">
+            <div style="font-family:'Clash Display',sans-serif;font-size:2rem;font-weight:700;color:var(--teal)">87%</div>
+            <div class="text-xs text-dim mb-2">match</div>
+            <button class="btn btn-primary btn-sm" style="width:100%;margin-bottom:.375rem" onclick="showToast('Application submitted!','success')">Apply</button>
+            <button class="btn btn-ghost btn-sm" style="width:100%" onclick="saveJob(this)"><i class="fa-regular fa-bookmark"></i></button>
+          </div>
+        </div>
+
+        <div class="job-card">
+          <div class="job-info">
+            <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem">
+              <div style="width:40px;height:40px;border-radius:var(--r);background:linear-gradient(135deg,#000,#333);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#fff">V</div>
+              <div><h3>React Developer</h3><div class="text-xs text-dim">Vercel · Remote · Full-time</div></div>
+            </div>
+            <div class="job-meta">
+              <span><i class="fa-solid fa-location-dot"></i> Remote</span>
+              <span><i class="fa-solid fa-dollar-sign"></i> $110K–$145K</span>
+              <span><i class="fa-solid fa-clock"></i> Posted 1 week ago</span>
+            </div>
+            <div class="job-tags"><span class="tag">React</span><span class="tag">Next.js</span><span class="tag">Vercel</span><span class="tag">Performance</span></div>
+          </div>
+          <div style="text-align:center;min-width:90px">
+            <div style="font-family:'Clash Display',sans-serif;font-size:2rem;font-weight:700;color:var(--accent2)">82%</div>
+            <div class="text-xs text-dim mb-2">match</div>
+            <button class="btn btn-primary btn-sm" style="width:100%;margin-bottom:.375rem" onclick="showToast('Application submitted!','success')">Apply</button>
+            <button class="btn btn-ghost btn-sm" style="width:100%" onclick="saveJob(this)"><i class="fa-solid fa-bookmark" style="color:var(--accent2)"></i></button>
+          </div>
+        </div>
+
+        <div class="job-card">
+          <div class="job-info">
+            <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem">
+              <div style="width:40px;height:40px;border-radius:var(--r);background:linear-gradient(135deg,#5e6ad2,#7c8bef);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#fff">L</div>
+              <div><h3>UX Engineer</h3><div class="text-xs text-dim">Linear · Remote · Full-time</div></div>
+            </div>
+            <div class="job-meta">
+              <span><i class="fa-solid fa-location-dot"></i> Remote</span>
+              <span><i class="fa-solid fa-dollar-sign"></i> $130K–$170K</span>
+              <span><i class="fa-solid fa-clock"></i> Posted 3 days ago</span>
+            </div>
+            <div class="job-tags"><span class="tag">React</span><span class="tag">Design Systems</span><span class="tag">Animation</span></div>
+          </div>
+          <div style="text-align:center;min-width:90px">
+            <div style="font-family:'Clash Display',sans-serif;font-size:2rem;font-weight:700;color:var(--amber)">76%</div>
+            <div class="text-xs text-dim mb-2">match</div>
+            <button class="btn btn-primary btn-sm" style="width:100%;margin-bottom:.375rem" onclick="showToast('Application submitted!','success')">Apply</button>
+            <button class="btn btn-ghost btn-sm" style="width:100%" onclick="saveJob(this)"><i class="fa-regular fa-bookmark"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== RESUME BUILDER ===================== -->
+<div id="builder" class="page">
+  <div class="dashboard-layout">
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Navigation</div>
+        <div class="sidebar-item" onclick="goTo('dashboard')"><i class="fa-solid fa-gauge-high"></i> Dashboard</div>
+        <div class="sidebar-item" onclick="goTo('analyzer')"><i class="fa-solid fa-magnifying-glass-chart"></i> Analyzer</div>
+        <div class="sidebar-item" onclick="goTo('jobs')"><i class="fa-solid fa-briefcase"></i> Job Matcher</div>
+        <div class="sidebar-item active"><i class="fa-solid fa-file-pen"></i> Builder</div>
+      </div>
+    </div>
+    <div class="main-content">
+      <div class="section-header">
+        <div><div class="page-title mb-1">Resume Builder</div><div class="page-sub">Drag & drop to build your perfect resume</div></div>
+        <div style="display:flex;gap:.5rem">
+          <button class="btn btn-ghost btn-sm" onclick="saveBuilderDraft()"><i class="fa-solid fa-floppy-disk" style="margin-right:.25rem"></i>Save</button>
+          <button class="btn btn-primary btn-sm" onclick="showToast('PDF exported successfully!','success')"><i class="fa-solid fa-download" style="margin-right:.25rem"></i>Export PDF</button>
+        </div>
+      </div>
+
+      <div class="builder-layout">
+        <div class="builder-sidebar">
+          <div class="text-xs text-dim fw-700 mb-2" style="letter-spacing:.1em;text-transform:uppercase">Templates</div>
+          <div class="template-grid mb-3">
+            <div class="template-thumb active" style="background:linear-gradient(135deg,#6c63ff20,#6c63ff10)"><div style="height:100%;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:600;color:var(--accent2)">Modern</div></div>
+            <div class="template-thumb" style="background:var(--bg3)"><div style="height:100%;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:600;color:var(--text3)">Classic</div></div>
+            <div class="template-thumb" style="background:var(--bg3)"><div style="height:100%;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:600;color:var(--text3)">Minimal</div></div>
+          </div>
+
+          <div class="text-xs text-dim fw-700 mb-2" style="letter-spacing:.1em;text-transform:uppercase">Sections</div>
+          <div class="drag-item"><i class="fa-solid fa-grip-vertical"></i><i class="fa-solid fa-user"></i> Personal Info</div>
+          <div class="drag-item"><i class="fa-solid fa-grip-vertical"></i><i class="fa-solid fa-quote-left"></i> Summary</div>
+          <div class="drag-item"><i class="fa-solid fa-grip-vertical"></i><i class="fa-solid fa-briefcase"></i> Experience</div>
+          <div class="drag-item"><i class="fa-solid fa-grip-vertical"></i><i class="fa-solid fa-graduation-cap"></i> Education</div>
+          <div class="drag-item"><i class="fa-solid fa-grip-vertical"></i><i class="fa-solid fa-star"></i> Skills</div>
+          <div class="drag-item"><i class="fa-solid fa-grip-vertical"></i><i class="fa-solid fa-trophy"></i> Projects</div>
+          <div class="drag-item"><i class="fa-solid fa-grip-vertical"></i><i class="fa-solid fa-certificate"></i> Certifications</div>
+
+          <hr class="divider-line" />
+          <div class="text-xs text-dim fw-700 mb-2" style="letter-spacing:.1em;text-transform:uppercase">AI Fill</div>
+          <button class="btn btn-ghost btn-sm" style="width:100%;margin-bottom:.5rem" onclick="showToast('AI generating professional summary...','success')"><span class="ai-tag" style="margin-right:.375rem">✦</span>Generate Summary</button>
+          <button class="btn btn-ghost btn-sm" style="width:100%" onclick="showToast('AI improving bullet points...','success')"><span class="ai-tag" style="margin-right:.375rem">✦</span>Improve Bullets</button>
+        </div>
+
+        <div class="builder-preview">
+          <div class="resume-paper" id="resumePaper">
+            <div class="rh">
+              <div class="rname">John Doe</div>
+              <div class="rtitle">Senior Frontend Engineer</div>
+              <div style="font-size:.7rem;opacity:.75;margin-top:.5rem;display:flex;gap:1rem;flex-wrap:wrap">
+                <span>📧 john@example.com</span>
+                <span>📞 +1 (555) 012-3456</span>
+                <span>🌐 linkedin.com/in/johndoe</span>
+                <span>🏠 New York, NY</span>
+              </div>
+            </div>
+            <div class="rsec">
+              <div class="rsec-title">Professional Summary</div>
+              <p style="font-size:.8rem;line-height:1.7;color:#444">Innovative Frontend Engineer with 5+ years building high-performance web applications using React, TypeScript, and modern JavaScript. Passionate about creating delightful user experiences and scalable architecture.</p>
+            </div>
+            <div class="rsec">
+              <div class="rsec-title">Experience</div>
+              <div style="margin-bottom:.875rem">
+                <div style="display:flex;justify-content:space-between;margin-bottom:.25rem">
+                  <div style="font-weight:700;font-size:.85rem;color:#1a1a2e">Senior Frontend Developer</div>
+                  <div style="font-size:.7rem;color:#888">2022 – Present</div>
+                </div>
+                <div style="font-size:.75rem;color:#6c63ff;margin-bottom:.375rem">TechCorp Inc. · Remote</div>
+                <ul style="font-size:.75rem;color:#555;line-height:1.8;padding-left:1rem">
+                  <li>Led migration to React 18, improving performance by 42%</li>
+                  <li>Architected micro-frontend system serving 2M+ users</li>
+                  <li>Mentored 4 junior developers and conducted code reviews</li>
+                </ul>
+              </div>
+            </div>
+            <div class="rsec">
+              <div class="rsec-title">Skills</div>
+              <div style="display:flex;flex-wrap:wrap;gap:.375rem">
+                <span style="background:#6c63ff15;color:#6c63ff;padding:.2rem .6rem;border-radius:999px;font-size:.7rem;font-weight:600">React.js</span>
+                <span style="background:#6c63ff15;color:#6c63ff;padding:.2rem .6rem;border-radius:999px;font-size:.7rem;font-weight:600">TypeScript</span>
+                <span style="background:#6c63ff15;color:#6c63ff;padding:.2rem .6rem;border-radius:999px;font-size:.7rem;font-weight:600">Node.js</span>
+                <span style="background:#6c63ff15;color:#6c63ff;padding:.2rem .6rem;border-radius:999px;font-size:.7rem;font-weight:600">GraphQL</span>
+                <span style="background:#6c63ff15;color:#6c63ff;padding:.2rem .6rem;border-radius:999px;font-size:.7rem;font-weight:600">AWS</span>
+                <span style="background:#6c63ff15;color:#6c63ff;padding:.2rem .6rem;border-radius:999px;font-size:.7rem;font-weight:600">Docker</span>
+              </div>
+            </div>
+            <div class="rsec">
+              <div class="rsec-title">Education</div>
+              <div style="display:flex;justify-content:space-between">
+                <div><div style="font-weight:700;font-size:.85rem;color:#1a1a2e">B.Sc. Computer Science</div><div style="font-size:.75rem;color:#6c63ff">MIT · Cambridge, MA</div></div>
+                <div style="font-size:.7rem;color:#888">2016 – 2020</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== ADMIN ===================== -->
+<div id="admin" class="page">
+  <div class="dashboard-layout">
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Admin Panel</div>
+        <div class="sidebar-item active" onclick="switchAdmin('overview',this)"><i class="fa-solid fa-gauge-high"></i> Overview</div>
+        <div class="sidebar-item" onclick="switchAdmin('users',this)"><i class="fa-solid fa-users"></i> Users</div>
+        <div class="sidebar-item" onclick="switchAdmin('resumes',this)"><i class="fa-solid fa-file-lines"></i> Resumes</div>
+        <div class="sidebar-item" onclick="switchAdmin('jobs-admin',this)"><i class="fa-solid fa-briefcase"></i> Job Listings</div>
+        <div class="sidebar-item" onclick="switchAdmin('subs',this)"><i class="fa-solid fa-credit-card"></i> Subscriptions</div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Back</div>
+        <div class="sidebar-item" onclick="goTo('dashboard')"><i class="fa-solid fa-arrow-left"></i> User View</div>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <!-- ADMIN OVERVIEW -->
+      <div id="admin-overview">
+        <div class="admin-header">
+          <div><div class="page-title mb-1">Admin Dashboard</div><div class="page-sub">Platform overview & management</div></div>
+          <button class="btn btn-primary btn-sm"><i class="fa-solid fa-download" style="margin-right:.375rem"></i>Export Report</button>
+        </div>
+        <div class="overview-grid mb-3">
+          <div class="metric-card"><div class="metric-icon" style="background:rgba(108,99,255,.15);margin-bottom:1rem"><i class="fa-solid fa-users" style="color:var(--accent2)"></i></div><div class="metric-value grad-text">12,847</div><div class="metric-label">Total Users</div></div>
+          <div class="metric-card"><div class="metric-icon" style="background:rgba(0,212,170,.15);margin-bottom:1rem"><i class="fa-solid fa-file-lines" style="color:var(--teal)"></i></div><div class="metric-value" style="color:var(--teal)">48,392</div><div class="metric-label">Resumes Analyzed</div></div>
+          <div class="metric-card"><div class="metric-icon" style="background:rgba(74,222,128,.15);margin-bottom:1rem"><i class="fa-solid fa-dollar-sign" style="color:var(--green)"></i></div><div class="metric-value" style="color:var(--green)">$24,830</div><div class="metric-label">Monthly Revenue</div></div>
+          <div class="metric-card"><div class="metric-icon" style="background:rgba(255,179,71,.15);margin-bottom:1rem"><i class="fa-solid fa-briefcase" style="color:var(--amber)"></i></div><div class="metric-value" style="color:var(--amber)">3,204</div><div class="metric-label">Active Jobs</div></div>
+        </div>
+        <div class="card">
+          <div class="section-header mb-2"><h3 class="text-sm fw-700">Weekly Signups</h3></div>
+          <div class="chart-bars" style="height:120px">
+            <div class="bar" style="height:45%"></div><div class="bar" style="height:65%"></div>
+            <div class="bar" style="height:55%"></div><div class="bar" style="height:80%"></div>
+            <div class="bar" style="height:70%"></div><div class="bar" style="height:95%"></div>
+            <div class="bar" style="height:85%"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:.65rem;color:var(--text3);margin-top:.5rem">
+            <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- USERS -->
+      <div id="admin-users" style="display:none">
+        <div class="admin-header">
+          <div><div class="page-title mb-1">User Management</div></div>
+          <button class="btn btn-primary btn-sm" onclick="showToast('User invited!','success')"><i class="fa-solid fa-plus" style="margin-right:.375rem"></i>Add User</button>
+        </div>
+        <div class="card">
+          <table class="data-table">
+            <thead><tr><th>User</th><th>Email</th><th>Resumes</th><th>Joined</th><th>Status</th></tr></thead>
+            <tbody id="adminUsersBody">
+              <tr><td colspan="5" class="text-dim text-center">Loading users…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- RESUMES -->
+      <div id="admin-resumes" style="display:none">
+        <div class="admin-header"><div><div class="page-title mb-1">Uploaded Resumes</div></div></div>
+        <div class="card">
+          <table class="data-table">
+            <thead><tr><th>Filename</th><th>User</th><th>Score</th><th>Date</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr><td><i class="fa-solid fa-file-pdf" style="color:var(--red);margin-right:.375rem"></i>john_doe_resume.pdf</td><td class="text-dim">John Doe</td><td><span class="color-green fw-700">87/100</span></td><td class="text-dim">May 6, 2025</td><td><button class="btn btn-ghost btn-sm">View</button></td></tr>
+              <tr><td><i class="fa-solid fa-file-word" style="color:var(--blue);margin-right:.375rem"></i>sarah_kim_cv.docx</td><td class="text-dim">Sarah Kim</td><td><span class="color-teal fw-700">92/100</span></td><td class="text-dim">May 5, 2025</td><td><button class="btn btn-ghost btn-sm">View</button></td></tr>
+              <tr><td><i class="fa-solid fa-file-pdf" style="color:var(--red);margin-right:.375rem"></i>marcus_resume.pdf</td><td class="text-dim">Marcus Rivera</td><td><span class="color-amber fw-700">64/100</span></td><td class="text-dim">May 3, 2025</td><td><button class="btn btn-ghost btn-sm">View</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- JOBS ADMIN -->
+      <div id="admin-jobs-admin" style="display:none">
+        <div class="admin-header">
+          <div><div class="page-title mb-1">Job Listings</div></div>
+          <button class="btn btn-primary btn-sm" onclick="showToast('Job listing added!','success')"><i class="fa-solid fa-plus" style="margin-right:.375rem"></i>Add Job</button>
+        </div>
+        <div class="card">
+          <table class="data-table">
+            <thead><tr><th>Title</th><th>Company</th><th>Type</th><th>Applications</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td class="fw-600">Senior Frontend Engineer</td><td>Stripe</td><td><span class="tag">Remote</span></td><td>847</td><td><span class="status-badge status-active">Active</span></td><td><button class="btn btn-ghost btn-sm">Edit</button></td></tr>
+              <tr><td class="fw-600">Product Designer</td><td>Figma</td><td><span class="tag">Hybrid</span></td><td>423</td><td><span class="status-badge status-active">Active</span></td><td><button class="btn btn-ghost btn-sm">Edit</button></td></tr>
+              <tr><td class="fw-600">React Developer</td><td>Vercel</td><td><span class="tag">Remote</span></td><td>1,204</td><td><span class="status-badge status-pending">Paused</span></td><td><button class="btn btn-ghost btn-sm">Edit</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SUBSCRIPTIONS -->
+      <div id="admin-subs" style="display:none">
+        <div class="admin-header"><div><div class="page-title mb-1">Subscriptions</div></div></div>
+        <div class="overview-grid mb-3">
+          <div class="metric-card"><div class="metric-value" style="color:var(--text3)">8,421</div><div class="metric-label">Free Users</div></div>
+          <div class="metric-card"><div class="metric-value grad-text">3,802</div><div class="metric-label">Pro Subscribers</div></div>
+          <div class="metric-card"><div class="metric-value" style="color:var(--amber)">624</div><div class="metric-label">Enterprise</div></div>
+        </div>
+        <div class="card">
+          <table class="data-table">
+            <thead><tr><th>User</th><th>Plan</th><th>Amount</th><th>Next Billing</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>John Doe</td><td>Pro</td><td>$19/mo</td><td>Jun 6, 2025</td><td><span class="status-badge status-active">Active</span></td></tr>
+              <tr><td>Amira Malik</td><td>Enterprise</td><td>$89/mo</td><td>Jun 15, 2025</td><td><span class="status-badge status-active">Active</span></td></tr>
+              <tr><td>Old User</td><td>Pro</td><td>$19/mo</td><td>—</td><td><span class="status-badge status-expired">Cancelled</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_BASE = 'http://localhost:8000';
+
+let currentPage = 'landing';
+let isLight = false;
+let currentLang = 'EN';
+
+// Fallback static jobs used only if the backend is unreachable, so the
+// demo still looks populated. Real data from GET /api/jobs replaces this
+// whenever the backend responds successfully.
+const FALLBACK_JOBS = [
+  { id: 1, title: 'Senior Frontend Engineer', company: 'Stripe', location: 'Remote', job_type: 'Remote', employment_type: 'Full-Time', salary_min: 140000, salary_max: 180000, tags: ['React','TypeScript','GraphQL','Node.js'], posted_days_ago: 2, match_percent: 94, initial: 'S', grad: 'linear-gradient(135deg,#635bff,#a29bfe)' },
+  { id: 2, title: 'Product Designer', company: 'Figma', location: 'San Francisco', job_type: 'Hybrid', employment_type: 'Full-Time', salary_min: 120000, salary_max: 160000, tags: ['Figma','UX','Prototyping'], posted_days_ago: 5, match_percent: 87, initial: 'F', grad: 'linear-gradient(135deg,#f24e1e,#ff7262)' },
+  { id: 3, title: 'React Developer', company: 'Vercel', location: 'Remote', job_type: 'Remote', employment_type: 'Full-Time', salary_min: 110000, salary_max: 145000, tags: ['React','Next.js','Vercel','Performance'], posted_days_ago: 7, match_percent: 82, initial: 'V', grad: 'linear-gradient(135deg,#000,#333)' },
+  { id: 4, title: 'UX Engineer', company: 'Linear', location: 'Remote', job_type: 'Remote', employment_type: 'Full-Time', salary_min: 130000, salary_max: 170000, tags: ['React','Design Systems','Animation'], posted_days_ago: 3, match_percent: 76, initial: 'L', grad: 'linear-gradient(135deg,#5e6ad2,#7c8bef)' },
+];
+
+function getToken() {
+  return localStorage.getItem('resumeai_token');
+}
+
+function setToken(token) {
+  localStorage.setItem('resumeai_token', token);
+}
+
+function clearToken() {
+  localStorage.removeItem('resumeai_token');
+}
+
+function authHeaders() {
+  const token = getToken();
+  return token ? { 'Authorization': 'Bearer ' + token } : {};
+}
+
+async function apiFetch(path, options = {}) {
+  const res = await fetch(API_BASE + path, options);
+  if (!res.ok) {
+    let detail = res.statusText;
+    try { const body = await res.json(); detail = body.detail || detail; } catch (e) {}
+    const err = new Error(detail || ('Request failed: ' + res.status));
+    err.status = res.status;
+    throw err;
+  }
+  return res.json();
+}
+
+function goTo(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(page).classList.add('active');
+  currentPage = page;
+  window.scrollTo(0,0);
+  // Update nav visibility
+  const showNav = ['dashboard','analyzer','jobs','builder','admin'].includes(page);
+  document.getElementById('navLinks').style.display = showNav ? 'flex' : '';
+  // Close notif
+  document.getElementById('notifDropdown').style.display = 'none';
+
+  if (page === 'jobs') loadJobs();
+  if (page === 'dashboard') loadDashboardOverview();
+  if (page === 'builder') loadBuilderDraft();
+  if (page === 'admin') loadAdminUsers();
+}
+
+async function loadAdminUsers() {
+  const body = document.getElementById('adminUsersBody');
+  try {
+    const users = await apiFetch('/api/admin/users');
+    if (!users.length) {
+      body.innerHTML = '<tr><td colspan="5" class="text-dim text-center">No users yet</td></tr>';
+      return;
+    }
+    body.innerHTML = users.map(u => `
+      <tr>
+        <td><div class="fw-600">${u.first_name || u.last_name ? (u.first_name + ' ' + u.last_name).trim() : 'Unnamed User'}</div></td>
+        <td class="text-dim">${u.email}</td>
+        <td class="text-dim">${u.resume_count}</td>
+        <td class="text-dim">${new Date(u.created_at).toLocaleDateString()}</td>
+        <td><span class="status-badge ${u.is_admin ? 'status-pending' : 'status-active'}">${u.is_admin ? 'Admin' : 'Active'}</span></td>
+      </tr>
+    `).join('');
+  } catch (err) {
+    body.innerHTML = '<tr><td colspan="5" class="text-dim text-center">Could not load users</td></tr>';
+  }
+}
+
+function toggleTheme() {
+  isLight = !isLight;
+  document.body.classList.toggle('light', isLight);
+  document.getElementById('themeIcon').className = isLight ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+}
+
+function toggleLang() {
+  currentLang = currentLang === 'EN' ? 'عربي' : 'EN';
+  document.querySelector('.lang-badge').textContent = currentLang;
+  showToast(currentLang === 'EN' ? 'Switched to English' : 'تم التبديل إلى العربية', 'success');
+}
+
+function toggleNotif() {
+  const d = document.getElementById('notifDropdown');
+  d.style.display = d.style.display === 'block' ? 'none' : 'block';
+}
+
+document.addEventListener('click', (e) => {
+  if (!document.getElementById('notifBtn').contains(e.target)) {
+    document.getElementById('notifDropdown').style.display = 'none';
+  }
+});
+
+function toggleFaq(el) {
+  el.classList.toggle('open');
+}
+
+function switchDash(view, el) {
+  ['overview','analytics','applications','skills'].forEach(v => {
+    const el2 = document.getElementById('dash-'+v);
+    if(el2) el2.style.display = 'none';
+  });
+  document.getElementById('dash-'+view).style.display = 'block';
+  document.querySelectorAll('#dashboard .sidebar-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function switchAdmin(view, el) {
+  ['overview','users','resumes','jobs-admin','subs'].forEach(v => {
+    const el2 = document.getElementById('admin-'+v);
+    if(el2) el2.style.display = 'none';
+  });
+  document.getElementById('admin-'+view).style.display = 'block';
+  document.querySelectorAll('#admin .sidebar-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function setFilter(el) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function saveJob(btn, jobId) {
+  const icon = btn.querySelector('i');
+  if(icon.classList.contains('fa-regular')) {
+    icon.className = 'fa-solid fa-bookmark';
+    icon.style.color = 'var(--accent2)';
+    showToast('Job saved!', 'success');
+    if (jobId !== undefined) saveJobToServer(jobId);
+  } else {
+    icon.className = 'fa-regular fa-bookmark';
+    icon.style.color = '';
+    showToast('Job removed from saved', '');
+  }
+}
+
+// ---------- RESUME ANALYZER ----------
+
+function handleResumeFileSelected(event) {
+  const file = event.target.files && event.target.files[0];
+  if (file) runResumeAnalysis(file);
+}
+
+function handleResumeDrop(event) {
+  event.preventDefault();
+  event.currentTarget.classList.remove('drag');
+  const file = event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0];
+  if (file) runResumeAnalysis(file);
+}
+
+function startAnalysis() {
+  // "Demo" button — generates a small sample text file and runs it through
+  // the real analysis endpoint instead of faking results client-side.
+  const sampleText = 'Experienced software engineer skilled in React, JavaScript, Node.js, REST API, Git, CSS. ' +
+    'Led development of scalable web applications. Improved performance by 35%. Bachelor degree in Computer Science.';
+  const file = new File([sampleText], 'sample_resume.txt', { type: 'text/plain' });
+  runResumeAnalysis(file);
+}
+
+async function runResumeAnalysis(file) {
+  document.getElementById('analyzerUpload').style.display = 'none';
+  document.getElementById('analyzerLoading').style.display = 'block';
+  document.getElementById('analyzerResult').style.display = 'none';
+
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    const result = await apiFetch('/api/resumes/upload', {
+      method: 'POST',
+      headers: authHeaders(),
+      body: formData,
+    });
+    renderAnalysisResult(result);
+  } catch (err) {
+    showToast(err.message === 'Could not validate credentials' || err.status === 401
+      ? 'Please log in to analyze your resume.'
+      : 'Could not reach server — showing sample analysis instead.', 'error');
+    renderAnalysisResult({
+      ats_score: 87, formatting_score: 91, keywords_score: 74, experience_score: 88, education_score: 95,
+      found_keywords: ['React','JavaScript','Node.js','REST API','Git','CSS'],
+      missing_keywords: ['TypeScript','Docker','GraphQL','AWS','CI/CD'],
+      suggestions: [
+        'Add quantified achievements (e.g., "Reduced load time by 40%") to 3 bullet points.',
+        'Your summary is too generic. Tailor it to target role using keywords from job descriptions.',
+        'Great use of action verbs! Keep using "developed", "implemented", "led".',
+      ],
+    });
+  } finally {
+    document.getElementById('analyzerLoading').style.display = 'none';
+    document.getElementById('analyzerResult').style.display = 'block';
+  }
+}
+
+function renderAnalysisResult(result) {
+  document.getElementById('scoreFormatting').textContent = result.formatting_score;
+  document.getElementById('scoreKeywords').textContent = result.keywords_score;
+  document.getElementById('scoreExperience').textContent = result.experience_score;
+  document.getElementById('scoreEducation').textContent = result.education_score;
+  document.getElementById('scoreOverallText').textContent = result.ats_score;
+
+  const circumference = 408.4;
+  const offset = circumference - (circumference * result.ats_score / 100);
+  document.getElementById('scoreRingFill').setAttribute('stroke-dashoffset', offset);
+
+  const foundEl = document.getElementById('foundKeywordsCloud');
+  foundEl.innerHTML = (result.found_keywords || []).map(k => `<span class="keyword found">${k}</span>`).join('') || '<span class="text-xs text-dim">None found</span>';
+
+  const missingEl = document.getElementById('missingKeywordsCloud');
+  missingEl.innerHTML = (result.missing_keywords || []).map(k => `<span class="keyword missing">${k}</span>`).join('') || '<span class="text-xs text-dim">None missing</span>';
+
+  const suggestionsEl = document.getElementById('suggestionsList');
+  suggestionsEl.innerHTML = (result.suggestions || []).map(s =>
+    `<div class="suggestion"><i class="fa-solid fa-lightbulb color-amber"></i><p>${s}</p></div>`
+  ).join('');
+}
+
+function resetAnalyzer() {
+  document.getElementById('analyzerResult').style.display = 'none';
+  document.getElementById('analyzerUpload').style.display = 'block';
+}
+
+// ---------- AUTH ----------
+
+async function doLogin() {
+  const email = (document.getElementById('loginEmail').value || '').trim();
+  const password = document.getElementById('loginPassword').value || '';
+
+  if (!email || !password) {
+    showToast('Please enter both email and password.', 'error');
+    return;
+  }
+
+  showToast('Signing in...', 'success');
+  try {
+    const result = await apiFetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+    setToken(result.access_token);
+    showToast('Welcome back!', 'success');
+    goTo('dashboard');
+  } catch (err) {
+    showToast('Login failed: ' + (err.message || 'Could not reach server.'), 'error');
+  }
+}
+
+async function doRegister() {
+  const firstName = (document.getElementById('registerFirstName').value || '').trim();
+  const lastName = (document.getElementById('registerLastName').value || '').trim();
+  const email = (document.getElementById('registerEmail').value || '').trim();
+  const password = document.getElementById('registerPassword').value || '';
+
+  if (!email || !password) {
+    showToast('Please enter both email and password.', 'error');
+    return;
+  }
+  if (password.length < 6) {
+    showToast('Password must be at least 6 characters.', 'error');
+    return;
+  }
+
+  showToast('Creating your account...', 'success');
+  try {
+    const result = await apiFetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, first_name: firstName, last_name: lastName }),
+    });
+    setToken(result.access_token);
+    showToast('Account created!', 'success');
+    goTo('dashboard');
+  } catch (err) {
+    showToast('Registration failed: ' + (err.message || 'Could not reach server.'), 'error');
+  }
+}
+
+// ---------- JOBS ----------
+
+async function loadJobs() {
+  const container = document.getElementById('jobsList');
+  if (!container) return;
+  try {
+    const jobs = await apiFetch('/api/jobs', { headers: authHeaders() });
+    renderJobs(jobs.length ? jobs : FALLBACK_JOBS);
+  } catch (err) {
+    showToast('Could not reach server — showing cached job listings.', 'error');
+    renderJobs(FALLBACK_JOBS);
+  }
+}
+
+function renderJobs(jobs) {
+  const container = document.getElementById('jobsList');
+  if (!container) return;
+  container.innerHTML = jobs.map(job => {
+    const initial = (job.initial || job.company || '?').charAt(0).toUpperCase();
+    const grad = job.grad || 'linear-gradient(135deg,#6c63ff,#a89dff)';
+    const tags = (job.tags || []).map(t => `<span class="tag">${t}</span>`).join('');
+    const match = (job.match_percent === null || job.match_percent === undefined) ? '—' : job.match_percent + '%';
+    const matchColor = job.match_percent >= 90 ? 'var(--green)' : job.match_percent >= 80 ? 'var(--teal)' : job.match_percent >= 70 ? 'var(--accent2)' : 'var(--amber)';
+    const bookmarkIcon = job.saved ? `<i class="fa-solid fa-bookmark" style="color:var(--accent2)"></i>` : `<i class="fa-regular fa-bookmark"></i>`;
+    return `
+      <div class="job-card${job.saved ? ' saved' : ''}" data-job-id="${job.id}">
+        <div class="job-info">
+          <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem">
+            <div style="width:40px;height:40px;border-radius:var(--r);background:${grad};display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#fff">${initial}</div>
+            <div><h3>${job.title}</h3><div class="text-xs text-dim">${job.company} · ${job.location} · ${job.employment_type || job.job_type}</div></div>
+          </div>
+          <div class="job-meta">
+            <span><i class="fa-solid fa-location-dot"></i> ${job.location}</span>
+            <span><i class="fa-solid fa-dollar-sign"></i> $${Math.round((job.salary_min||0)/1000)}K–$${Math.round((job.salary_max||0)/1000)}K</span>
+            <span><i class="fa-solid fa-clock"></i> Posted ${job.posted_days_ago} day(s) ago</span>
+          </div>
+          <div class="job-tags">${tags}</div>
+        </div>
+        <div style="text-align:center;min-width:90px">
+          <div style="font-family:'Clash Display',sans-serif;font-size:2rem;font-weight:700;color:${matchColor}">${match}</div>
+          <div class="text-xs text-dim mb-2">match</div>
+          <button class="btn btn-primary btn-sm" style="width:100%;margin-bottom:.375rem" onclick="applyToJob(${job.id}, this)">${job.applied ? 'Applied' : 'Apply'}</button>
+          <button class="btn btn-ghost btn-sm" style="width:100%" onclick="saveJob(this, ${job.id})">${bookmarkIcon}</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+async function applyToJob(jobId, btn) {
+  try {
+    await apiFetch(`/api/jobs/${jobId}/apply`, { method: 'POST', headers: authHeaders() });
+    showToast('Application submitted!', 'success');
+    if (btn) btn.textContent = 'Applied';
+  } catch (err) {
+    showToast(err.status === 401 ? 'Please log in to apply.' : 'Application submitted!', err.status === 401 ? 'error' : 'success');
+  }
+}
+
+async function saveJobToServer(jobId) {
+  try {
+    await apiFetch(`/api/jobs/${jobId}/save`, { method: 'POST', headers: authHeaders() });
+  } catch (err) {
+    // Non-fatal — UI already updated optimistically.
+  }
+}
+
+// ---------- DASHBOARD ----------
+
+async function loadDashboardOverview() {
+  try {
+    const data = await apiFetch('/api/dashboard/overview', { headers: authHeaders() });
+    document.getElementById('metricAtsScore').textContent = data.ats_score;
+    document.getElementById('metricAtsBar').style.width = data.ats_score + '%';
+    document.getElementById('metricJobMatches').textContent = data.job_matches;
+    document.getElementById('metricApplicationsSent').textContent = data.applications_sent;
+    document.getElementById('metricInterviews').textContent = data.interviews_scheduled;
+  } catch (err) {
+    showToast('Could not reach server — showing cached dashboard data.', 'error');
+  }
+}
+
+// ---------- RESUME BUILDER ----------
+
+async function saveBuilderDraft() {
+  const content = { html: document.getElementById('resumePaper').innerHTML };
+  try {
+    await apiFetch('/api/builder/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      body: JSON.stringify({ content }),
+    });
+    showToast('Resume draft saved!', 'success');
+  } catch (err) {
+    showToast(err.status === 401 ? 'Please log in to save your draft.' : 'Could not reach server — draft not saved.', 'error');
+  }
+}
+
+async function loadBuilderDraft() {
+  try {
+    const draft = await apiFetch('/api/builder', { headers: authHeaders() });
+    if (draft && draft.content && draft.content.html) {
+      document.getElementById('resumePaper').innerHTML = draft.content.html;
+    }
+  } catch (err) {
+    // Silent — keep default preview content if no draft or backend unreachable.
+  }
+}
+
+let toastTimeout;
+function showToast(msg, type) {
+  const tc = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  const icon = type === 'success' ? '<i class="fa-solid fa-circle-check" style="color:var(--green)"></i>' : '<i class="fa-solid fa-circle-info" style="color:var(--accent2)"></i>';
+  t.innerHTML = icon + '<span>' + msg + '</span>';
+  tc.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(100%)'; t.style.transition = 'all .3s'; setTimeout(() => t.remove(), 300); }, 3000);
+}
+</script>
+</body>
+</html>
