@@ -5,111 +5,112 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>ResumeAI — AI Resume Analyzer & Job Matcher</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
-<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Satoshi:wght@300;400;500;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 <style>
+  /* ── Design tokens ── */
   :root {
-    --bg: #0a0b0f;
-    --bg2: #111218;
-    --bg3: #1a1b23;
-    --bg4: #22232e;
-    --glass: rgba(255,255,255,0.04);
-    --glass2: rgba(255,255,255,0.08);
-    --border: rgba(255,255,255,0.08);
-    --border2: rgba(255,255,255,0.14);
-    --text: #f0f0f5;
-    --text2: #9b9cb5;
-    --text3: #6b6c80;
-    --accent: #6c63ff;
-    --accent2: #8b83ff;
-    --accent3: #a89dff;
-    --teal: #00d4aa;
-    --teal2: #00b896;
-    --pink: #ff6b9d;
-    --amber: #ffb347;
-    --green: #4ade80;
-    --red: #f87171;
-    --blue: #60a5fa;
-    --grad1: linear-gradient(135deg, #6c63ff, #a89dff);
-    --grad2: linear-gradient(135deg, #00d4aa, #6c63ff);
-    --grad3: linear-gradient(135deg, #ff6b9d, #6c63ff);
-    --shadow: 0 20px 60px rgba(108,99,255,0.15);
-    --r: 12px;
-    --r2: 16px;
-    --r3: 20px;
-    --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    --bg: #FAFAF8;
+    --bg2: #FFFFFF;
+    --bg3: #F4F3EF;
+    --bg4: #ECEAE4;
+    --glass: rgba(0,0,0,0.03);
+    --glass2: rgba(0,0,0,0.06);
+    --border: #E5E3DB;
+    --border2: #C9C6BC;
+    --text: #0F0F14;
+    --text2: #4A4A5A;
+    --text3: #8A8A9A;
+    --accent: #005AFF;
+    --accent2: #2B72FF;
+    --accent3: #6699FF;
+    --teal: #1A6B4A;
+    --teal2: #145538;
+    --pink: #9B3058;
+    --amber: #A05C1A;
+    --green: #1A6B4A;
+    --red: #B91C1C;
+    --blue: #005AFF;
+    --grad1: linear-gradient(135deg, #005AFF, #2B72FF);
+    --grad2: linear-gradient(135deg, #1A6B4A, #005AFF);
+    --grad3: linear-gradient(135deg, #9B3058, #005AFF);
+    --shadow: 0 2px 16px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04);
+    --r: 8px;
+    --r2: 12px;
+    --r3: 16px;
+    --transition: all 0.2s ease;
   }
+  /* Dark mode via .light toggle (legacy name kept for JS compatibility) */
   .light {
-    --bg: #f5f5fa;
-    --bg2: #ffffff;
-    --bg3: #eeeef5;
-    --bg4: #e4e4ef;
-    --glass: rgba(108,99,255,0.05);
-    --glass2: rgba(108,99,255,0.08);
-    --border: rgba(108,99,255,0.12);
-    --border2: rgba(108,99,255,0.2);
-    --text: #1a1a2e;
-    --text2: #5b5c7a;
-    --text3: #9394aa;
-    --shadow: 0 20px 60px rgba(108,99,255,0.1);
+    --bg: #0F0F14;
+    --bg2: #18181F;
+    --bg3: #22222C;
+    --bg4: #2A2A36;
+    --glass: rgba(255,255,255,0.03);
+    --glass2: rgba(255,255,255,0.07);
+    --border: rgba(255,255,255,0.09);
+    --border2: rgba(255,255,255,0.16);
+    --text: #F0F0F5;
+    --text2: #8A8A9E;
+    --text3: #5A5A6E;
+    --shadow: 0 2px 16px rgba(0,0,0,0.4);
   }
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family: 'Satoshi', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; transition: var(--transition); }
-  h1,h2,h3,h4 { font-family: 'Clash Display', sans-serif; }
+  body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); overflow-x:hidden; transition:var(--transition); }
+  h1,h2,h3,h4 { font-family:'Bricolage Grotesque',sans-serif; }
   .page { display:none; }
   .page.active { display:block; }
 
   /* NAV */
   nav {
-    position: fixed; top:0; left:0; right:0; z-index:1000;
+    position:fixed; top:0; left:0; right:0; z-index:1000;
     display:flex; align-items:center; justify-content:space-between;
-    padding: 0 2rem; height:64px;
-    background: rgba(10,11,15,0.7);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
-    transition: var(--transition);
+    padding:0 2rem; height:64px;
+    background:var(--bg2);
+    border-bottom:1px solid var(--border);
+    transition:var(--transition);
   }
-  .light nav { background: rgba(245,245,250,0.8); }
-  .logo { font-family:'Clash Display',sans-serif; font-size:1.4rem; font-weight:700; background: var(--grad1); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; cursor:pointer; }
+  .logo { font-family:'Bricolage Grotesque',sans-serif; font-size:1.4rem; font-weight:700; color:var(--accent); cursor:pointer; letter-spacing:-.02em; }
   .nav-links { display:flex; gap:2rem; align-items:center; }
   .nav-links a { color:var(--text2); text-decoration:none; font-size:.9rem; font-weight:500; cursor:pointer; transition:var(--transition); }
   .nav-links a:hover { color:var(--text); }
   .nav-right { display:flex; gap:.75rem; align-items:center; }
-  .btn { padding:.5rem 1.25rem; border-radius:var(--r); font-size:.875rem; font-weight:600; cursor:pointer; border:none; transition:var(--transition); font-family:'Satoshi',sans-serif; }
+  .btn { padding:.5rem 1.25rem; border-radius:var(--r); font-size:.875rem; font-weight:600; cursor:pointer; border:none; transition:var(--transition); font-family:'DM Sans',sans-serif; }
   .btn-ghost { background:transparent; color:var(--text2); border:1px solid var(--border); }
-  .btn-ghost:hover { border-color:var(--border2); color:var(--text); }
-  .btn-primary { background: var(--grad1); color:#fff; }
-  .btn-primary:hover { transform:translateY(-1px); box-shadow:0 8px 25px rgba(108,99,255,0.4); }
+  .btn-ghost:hover { border-color:var(--border2); color:var(--text); background:var(--bg3); }
+  .btn-primary { background:var(--accent); color:#fff; }
+  .btn-primary:hover { background:var(--accent2); transform:translateY(-1px); box-shadow:0 6px 20px rgba(0,90,255,0.25); }
   .btn-sm { padding:.375rem .875rem; font-size:.8rem; }
   .btn-lg { padding:.75rem 2rem; font-size:1rem; border-radius:var(--r2); }
-  .theme-toggle { width:36px; height:36px; border-radius:50%; background:var(--glass); border:1px solid var(--border); color:var(--text2); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:var(--transition); }
-  .theme-toggle:hover { color:var(--text); background:var(--glass2); }
+  .theme-toggle { width:36px; height:36px; border-radius:50%; background:transparent; border:1px solid var(--border); color:var(--text2); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:var(--transition); }
+  .theme-toggle:hover { color:var(--text); background:var(--bg3); }
 
   /* HERO */
   .hero {
     min-height:100vh; display:flex; align-items:center; justify-content:center;
     text-align:center; padding:6rem 2rem 4rem;
     position:relative; overflow:hidden;
+    background:var(--bg);
   }
   .hero-bg {
     position:absolute; inset:0; z-index:0;
-    background: radial-gradient(ellipse 80% 60% at 50% -20%, rgba(108,99,255,0.3) 0%, transparent 70%),
-                radial-gradient(ellipse 60% 50% at 80% 80%, rgba(0,212,170,0.15) 0%, transparent 60%),
-                radial-gradient(ellipse 50% 40% at 10% 60%, rgba(255,107,157,0.1) 0%, transparent 50%);
+    background:
+      radial-gradient(ellipse 70% 50% at 50% 0%, rgba(0,90,255,0.06) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 30% at 90% 80%, rgba(26,107,74,0.04) 0%, transparent 60%);
   }
   .hero-content { position:relative; z-index:1; max-width:900px; }
-  .badge { display:inline-flex; align-items:center; gap:.5rem; padding:.375rem 1rem; border-radius:999px; background:rgba(108,99,255,0.15); border:1px solid rgba(108,99,255,0.3); color:var(--accent3); font-size:.8rem; font-weight:600; margin-bottom:2rem; }
+  .badge { display:inline-flex; align-items:center; gap:.5rem; padding:.375rem 1rem; border-radius:999px; background:rgba(0,90,255,0.08); border:1px solid rgba(0,90,255,0.2); color:var(--accent); font-size:.8rem; font-weight:600; margin-bottom:2rem; }
   .badge-dot { width:6px; height:6px; border-radius:50%; background:var(--teal); animation:pulse 2s infinite; }
   @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.6;transform:scale(1.3)} }
-  .hero h1 { font-size:clamp(2.5rem,6vw,5rem); font-weight:700; line-height:1.05; margin-bottom:1.5rem; }
-  .grad-text { background: var(--grad1); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
-  .grad-text2 { background: var(--grad2); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
-  .grad-text3 { background: var(--grad3); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
-  .hero p { font-size:1.2rem; color:var(--text2); max-width:600px; margin:0 auto 2.5rem; line-height:1.7; }
+  .hero h1 { font-size:clamp(2.5rem,6vw,5rem); font-weight:700; line-height:1.05; margin-bottom:1.5rem; letter-spacing:-.03em; }
+  .grad-text { color:var(--accent); }
+  .grad-text2 { color:var(--teal); }
+  .grad-text3 { color:var(--pink); }
+  .hero p { font-size:1.15rem; color:var(--text2); max-width:600px; margin:0 auto 2.5rem; line-height:1.75; }
   .hero-btns { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-bottom:4rem; }
   .hero-stats { display:flex; gap:3rem; justify-content:center; flex-wrap:wrap; }
   .stat { text-align:center; }
-  .stat-num { font-family:'Clash Display',sans-serif; font-size:2rem; font-weight:700; color:var(--text); }
+  .stat-num { font-family:'Bricolage Grotesque',sans-serif; font-size:2rem; font-weight:700; color:var(--text); }
   .stat-label { font-size:.8rem; color:var(--text3); margin-top:.25rem; }
 
   /* CARDS */
@@ -117,50 +118,51 @@
     background:var(--bg2); border:1px solid var(--border); border-radius:var(--r2);
     padding:1.5rem; transition:var(--transition);
   }
-  .card:hover { border-color:var(--border2); transform:translateY(-2px); box-shadow:var(--shadow); }
+  .card:hover { border-color:var(--border2); box-shadow:var(--shadow); }
   .glass-card {
-    background:var(--glass); border:1px solid var(--border); border-radius:var(--r2);
-    backdrop-filter:blur(10px); padding:1.5rem; transition:var(--transition);
+    background:var(--bg3); border:1px solid var(--border); border-radius:var(--r2);
+    padding:1.5rem; transition:var(--transition);
   }
 
   /* SECTIONS */
   section { padding:6rem 2rem; }
   .container { max-width:1200px; margin:0 auto; }
-  .section-label { font-size:.8rem; font-weight:700; letter-spacing:.15em; text-transform:uppercase; color:var(--accent); margin-bottom:1rem; }
-  .section-title { font-size:clamp(2rem,4vw,3rem); font-weight:700; margin-bottom:1rem; }
-  .section-sub { font-size:1.1rem; color:var(--text2); max-width:600px; }
+  .section-label { font-size:.75rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); margin-bottom:1rem; }
+  .section-title { font-size:clamp(2rem,4vw,3rem); font-weight:700; margin-bottom:1rem; letter-spacing:-.02em; }
+  .section-sub { font-size:1.05rem; color:var(--text2); max-width:600px; }
 
   /* FEATURES */
-  .features-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.5rem; margin-top:3rem; }
+  .features-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.25rem; margin-top:3rem; }
   .feature-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--r2); padding:1.75rem; transition:var(--transition); cursor:default; }
-  .feature-card:hover { border-color:rgba(108,99,255,0.4); box-shadow:0 0 30px rgba(108,99,255,0.1); }
-  .feature-icon { width:48px; height:48px; border-radius:var(--r); display:flex; align-items:center; justify-content:center; font-size:1.25rem; margin-bottom:1rem; }
-  .feature-card h3 { font-size:1.1rem; margin-bottom:.5rem; }
-  .feature-card p { font-size:.875rem; color:var(--text2); line-height:1.6; }
+  .feature-card:hover { border-color:var(--border2); box-shadow:var(--shadow); }
+  .feature-icon { width:44px; height:44px; border-radius:var(--r); display:flex; align-items:center; justify-content:center; font-size:1.1rem; margin-bottom:1rem; }
+  .feature-card h3 { font-size:1.05rem; margin-bottom:.5rem; }
+  .feature-card p { font-size:.875rem; color:var(--text2); line-height:1.65; }
 
   /* HOW IT WORKS */
   .steps { display:flex; flex-direction:column; gap:0; margin-top:3rem; position:relative; }
-  .step { display:flex; gap:2rem; align-items:flex-start; padding:2rem 0; }
-  .step-num { font-family:'Clash Display',sans-serif; font-size:3rem; font-weight:700; color:rgba(108,99,255,0.2); min-width:60px; line-height:1; }
-  .step-content h3 { font-size:1.2rem; margin-bottom:.5rem; }
+  .step { display:flex; gap:2rem; align-items:flex-start; padding:2rem 0; border-bottom:1px solid var(--border); }
+  .step:last-child { border-bottom:none; }
+  .step-num { font-family:'Bricolage Grotesque',sans-serif; font-size:2.5rem; font-weight:700; color:rgba(0,90,255,0.15); min-width:60px; line-height:1; }
+  .step-content h3 { font-size:1.15rem; margin-bottom:.5rem; }
   .step-content p { color:var(--text2); line-height:1.7; }
 
   /* TESTIMONIALS */
-  .testimonials-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.5rem; margin-top:3rem; }
+  .testimonials-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.25rem; margin-top:3rem; }
   .testimonial { background:var(--bg2); border:1px solid var(--border); border-radius:var(--r2); padding:1.75rem; }
   .stars { color:var(--amber); margin-bottom:1rem; font-size:.875rem; }
-  .testimonial p { color:var(--text2); line-height:1.7; margin-bottom:1.25rem; font-style:italic; font-size:.9rem; }
+  .testimonial p { color:var(--text2); line-height:1.7; margin-bottom:1.25rem; font-size:.9rem; }
   .testimonial-author { display:flex; align-items:center; gap:.75rem; }
   .avatar { width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.875rem; }
   .author-info .name { font-weight:600; font-size:.875rem; }
   .author-info .title { font-size:.75rem; color:var(--text3); }
 
   /* PRICING */
-  .pricing-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1.5rem; margin-top:3rem; max-width:960px; margin-left:auto; margin-right:auto; }
+  .pricing-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1.25rem; margin-top:3rem; max-width:960px; margin-left:auto; margin-right:auto; }
   .pricing-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--r2); padding:2rem; transition:var(--transition); }
-  .pricing-card.popular { border-color:var(--accent); box-shadow:0 0 40px rgba(108,99,255,0.2); position:relative; }
-  .popular-badge { position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:var(--grad1); color:#fff; font-size:.7rem; font-weight:700; padding:.25rem .75rem; border-radius:999px; white-space:nowrap; }
-  .price { font-family:'Clash Display',sans-serif; font-size:2.5rem; font-weight:700; }
+  .pricing-card.popular { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent); position:relative; }
+  .popular-badge { position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:var(--accent); color:#fff; font-size:.7rem; font-weight:700; padding:.25rem .875rem; border-radius:999px; white-space:nowrap; }
+  .price { font-family:'Bricolage Grotesque',sans-serif; font-size:2.5rem; font-weight:700; letter-spacing:-.03em; }
   .price span { font-size:1rem; font-weight:400; color:var(--text3); }
   .price-label { font-size:.8rem; color:var(--text3); margin-bottom:1.5rem; }
   .features-list { list-style:none; margin:1.5rem 0; display:flex; flex-direction:column; gap:.75rem; }
@@ -170,7 +172,7 @@
   .features-list li.no { color:var(--text3); }
 
   /* FAQ */
-  .faq-list { max-width:700px; margin:3rem auto 0; display:flex; flex-direction:column; gap:.75rem; }
+  .faq-list { max-width:700px; margin:3rem auto 0; display:flex; flex-direction:column; gap:.5rem; }
   .faq-item { background:var(--bg2); border:1px solid var(--border); border-radius:var(--r); overflow:hidden; }
   .faq-q { padding:1.25rem 1.5rem; cursor:pointer; display:flex; justify-content:space-between; align-items:center; font-weight:600; font-size:.95rem; }
   .faq-a { padding:0 1.5rem; max-height:0; overflow:hidden; transition:all .3s ease; font-size:.875rem; color:var(--text2); line-height:1.7; }
@@ -183,8 +185,8 @@
   .footer-grid { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:3rem; margin-bottom:3rem; }
   .footer-brand p { color:var(--text2); font-size:.875rem; line-height:1.7; margin-top:.75rem; max-width:280px; }
   .footer-social { display:flex; gap:.75rem; margin-top:1.25rem; }
-  .social-icon { width:36px; height:36px; border-radius:50%; background:var(--glass); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; color:var(--text3); font-size:.875rem; cursor:pointer; transition:var(--transition); }
-  .social-icon:hover { color:var(--text); border-color:var(--border2); }
+  .social-icon { width:36px; height:36px; border-radius:50%; background:transparent; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; color:var(--text3); font-size:.875rem; cursor:pointer; transition:var(--transition); }
+  .social-icon:hover { color:var(--text); border-color:var(--border2); background:var(--bg3); }
   .footer-col h4 { font-size:.875rem; font-weight:700; margin-bottom:1rem; }
   .footer-col ul { list-style:none; display:flex; flex-direction:column; gap:.6rem; }
   .footer-col li { font-size:.8rem; color:var(--text3); cursor:pointer; transition:var(--transition); }
@@ -193,15 +195,15 @@
   .footer-bottom p { font-size:.75rem; color:var(--text3); }
 
   /* AUTH */
-  .auth-page { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:6rem 2rem; }
+  .auth-page { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:6rem 2rem; background:var(--bg); }
   .auth-card { width:100%; max-width:440px; background:var(--bg2); border:1px solid var(--border); border-radius:var(--r3); padding:2.5rem; }
   .auth-logo { text-align:center; margin-bottom:2rem; }
-  .auth-card h2 { font-size:1.75rem; text-align:center; margin-bottom:.5rem; }
+  .auth-card h2 { font-size:1.75rem; text-align:center; margin-bottom:.5rem; letter-spacing:-.02em; }
   .auth-card .sub { text-align:center; color:var(--text2); font-size:.875rem; margin-bottom:2rem; }
   .form-group { margin-bottom:1.25rem; }
-  .form-group label { display:block; font-size:.8rem; font-weight:600; color:var(--text2); margin-bottom:.5rem; letter-spacing:.05em; }
-  .form-group input { width:100%; padding:.75rem 1rem; background:var(--bg3); border:1px solid var(--border); border-radius:var(--r); color:var(--text); font-size:.875rem; font-family:'Satoshi',sans-serif; outline:none; transition:var(--transition); }
-  .form-group input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(108,99,255,0.15); }
+  .form-group label { display:block; font-size:.78rem; font-weight:600; color:var(--text2); margin-bottom:.5rem; letter-spacing:.04em; text-transform:uppercase; }
+  .form-group input { width:100%; padding:.75rem 1rem; background:var(--bg3); border:1px solid var(--border); border-radius:var(--r); color:var(--text); font-size:.875rem; font-family:'DM Sans',sans-serif; outline:none; transition:var(--transition); }
+  .form-group input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(0,90,255,0.12); background:var(--bg2); }
   .input-icon-wrap { position:relative; }
   .input-icon-wrap i { position:absolute; left:.875rem; top:50%; transform:translateY(-50%); color:var(--text3); font-size:.875rem; }
   .input-icon-wrap input { padding-left:2.5rem; }
@@ -209,8 +211,8 @@
   .divider hr { flex:1; border:none; border-top:1px solid var(--border); }
   .divider span { font-size:.75rem; color:var(--text3); }
   .social-login { display:flex; gap:.75rem; }
-  .social-btn { flex:1; display:flex; align-items:center; justify-content:center; gap:.5rem; padding:.625rem; background:var(--bg3); border:1px solid var(--border); border-radius:var(--r); color:var(--text2); font-size:.8rem; cursor:pointer; transition:var(--transition); font-family:'Satoshi',sans-serif; }
-  .social-btn:hover { border-color:var(--border2); color:var(--text); }
+  .social-btn { flex:1; display:flex; align-items:center; justify-content:center; gap:.5rem; padding:.625rem; background:var(--bg3); border:1px solid var(--border); border-radius:var(--r); color:var(--text2); font-size:.8rem; cursor:pointer; transition:var(--transition); font-family:'DM Sans',sans-serif; }
+  .social-btn:hover { border-color:var(--border2); color:var(--text); background:var(--bg4); }
   .auth-link { text-align:center; font-size:.8rem; color:var(--text3); margin-top:1.5rem; }
   .auth-link a { color:var(--accent); cursor:pointer; }
 
@@ -218,10 +220,10 @@
   .dashboard-layout { display:flex; min-height:100vh; padding-top:64px; }
   .sidebar { width:240px; background:var(--bg2); border-right:1px solid var(--border); padding:1.5rem 0; position:fixed; top:64px; bottom:0; left:0; overflow-y:auto; transition:var(--transition); z-index:100; }
   .sidebar-section { margin-bottom:1.5rem; }
-  .sidebar-label { font-size:.65rem; font-weight:700; letter-spacing:.15em; text-transform:uppercase; color:var(--text3); padding:0 1.25rem; margin-bottom:.5rem; }
+  .sidebar-label { font-size:.62rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--text3); padding:0 1.25rem; margin-bottom:.5rem; }
   .sidebar-item { display:flex; align-items:center; gap:.75rem; padding:.625rem 1.25rem; color:var(--text2); cursor:pointer; transition:var(--transition); font-size:.875rem; font-weight:500; border-left:2px solid transparent; }
-  .sidebar-item:hover { color:var(--text); background:var(--glass); }
-  .sidebar-item.active { color:var(--accent2); border-left-color:var(--accent); background:rgba(108,99,255,0.08); }
+  .sidebar-item:hover { color:var(--text); background:var(--bg3); }
+  .sidebar-item.active { color:var(--accent); border-left-color:var(--accent); background:rgba(0,90,255,0.06); }
   .sidebar-item i { width:18px; font-size:.9rem; }
   .sidebar-badge { margin-left:auto; background:var(--accent); color:#fff; font-size:.65rem; font-weight:700; padding:.15rem .4rem; border-radius:999px; }
   .main-content { flex:1; margin-left:240px; padding:2rem; }
@@ -232,43 +234,43 @@
   .metric-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem; }
   .metric-icon { width:40px; height:40px; border-radius:var(--r); display:flex; align-items:center; justify-content:center; font-size:1rem; }
   .metric-trend { font-size:.7rem; font-weight:700; display:flex; align-items:center; gap:.25rem; padding:.2rem .5rem; border-radius:999px; }
-  .trend-up { color:#4ade80; background:rgba(74,222,128,0.1); }
-  .trend-down { color:#f87171; background:rgba(248,113,113,0.1); }
-  .metric-value { font-family:'Clash Display',sans-serif; font-size:2rem; font-weight:700; }
+  .trend-up { color:var(--teal); background:rgba(26,107,74,0.1); }
+  .trend-down { color:var(--red); background:rgba(185,28,28,0.1); }
+  .metric-value { font-family:'Bricolage Grotesque',sans-serif; font-size:2rem; font-weight:700; letter-spacing:-.02em; }
   .metric-label { font-size:.75rem; color:var(--text3); margin-top:.25rem; }
-  .progress-bar { height:6px; background:var(--bg3); border-radius:999px; margin-top:1rem; overflow:hidden; }
+  .progress-bar { height:5px; background:var(--bg3); border-radius:999px; margin-top:1rem; overflow:hidden; }
   .progress-fill { height:100%; border-radius:999px; transition:width 1s ease; }
 
   /* CIRCULAR PROGRESS */
   .circular-progress { position:relative; display:inline-flex; align-items:center; justify-content:center; }
   .circular-progress svg { transform:rotate(-90deg); }
-  .circular-progress .value { position:absolute; font-family:'Clash Display',sans-serif; font-size:1.5rem; font-weight:700; }
+  .circular-progress .value { position:absolute; font-family:'Bricolage Grotesque',sans-serif; font-size:1.5rem; font-weight:700; }
   .circular-progress .sub-label { position:absolute; bottom:10px; font-size:.6rem; color:var(--text3); }
 
   /* RESUME ANALYZER */
   .upload-zone { border:2px dashed var(--border); border-radius:var(--r2); padding:3rem; text-align:center; transition:var(--transition); cursor:pointer; }
-  .upload-zone:hover, .upload-zone.drag { border-color:var(--accent); background:rgba(108,99,255,0.05); }
+  .upload-zone:hover, .upload-zone.drag { border-color:var(--accent); background:rgba(0,90,255,0.04); }
   .upload-icon { font-size:2.5rem; color:var(--text3); margin-bottom:1rem; }
   .upload-zone h3 { margin-bottom:.5rem; }
   .upload-zone p { color:var(--text2); font-size:.875rem; }
   .analysis-result { margin-top:2rem; }
   .score-ring-section { text-align:center; margin-bottom:2rem; }
   .skills-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:.875rem; }
-  .skill-item { background:var(--bg3); border-radius:var(--r); padding:1rem; }
+  .skill-item { background:var(--bg3); border-radius:var(--r); padding:1rem; border:1px solid var(--border); }
   .skill-name { font-size:.8rem; font-weight:600; margin-bottom:.5rem; display:flex; justify-content:space-between; }
   .keywords-cloud { display:flex; flex-wrap:wrap; gap:.5rem; margin-top:1rem; }
   .keyword { padding:.25rem .625rem; border-radius:999px; font-size:.75rem; font-weight:600; }
-  .keyword.found { background:rgba(74,222,128,0.15); color:#4ade80; border:1px solid rgba(74,222,128,0.3); }
-  .keyword.missing { background:rgba(248,113,113,0.15); color:#f87171; border:1px solid rgba(248,113,113,0.3); }
+  .keyword.found { background:rgba(26,107,74,0.12); color:var(--teal); border:1px solid rgba(26,107,74,0.25); }
+  .keyword.missing { background:rgba(185,28,28,0.1); color:var(--red); border:1px solid rgba(185,28,28,0.2); }
   .suggestion-list { display:flex; flex-direction:column; gap:.75rem; margin-top:1rem; }
-  .suggestion { display:flex; gap:.75rem; align-items:flex-start; padding:.875rem 1rem; background:var(--bg3); border-radius:var(--r); }
+  .suggestion { display:flex; gap:.75rem; align-items:flex-start; padding:.875rem 1rem; background:var(--bg3); border-radius:var(--r); border:1px solid var(--border); }
   .suggestion i { color:var(--amber); margin-top:.1rem; font-size:.875rem; }
   .suggestion p { font-size:.8rem; color:var(--text2); line-height:1.6; }
 
   /* JOB MATCHER */
-  .job-filters { display:flex; gap:.75rem; flex-wrap:wrap; margin-bottom:1.5rem; }
-  .filter-chip { padding:.375rem .875rem; border-radius:999px; font-size:.8rem; font-weight:600; border:1px solid var(--border); color:var(--text2); cursor:pointer; transition:var(--transition); background:transparent; font-family:'Satoshi',sans-serif; }
-  .filter-chip:hover, .filter-chip.active { border-color:var(--accent); color:var(--accent2); background:rgba(108,99,255,0.1); }
+  .job-filters { display:flex; gap:.625rem; flex-wrap:wrap; margin-bottom:1.5rem; }
+  .filter-chip { padding:.375rem .875rem; border-radius:999px; font-size:.8rem; font-weight:600; border:1px solid var(--border); color:var(--text2); cursor:pointer; transition:var(--transition); background:transparent; font-family:'DM Sans',sans-serif; }
+  .filter-chip:hover, .filter-chip.active { border-color:var(--accent); color:var(--accent); background:rgba(0,90,255,0.07); }
   .jobs-list { display:flex; flex-direction:column; gap:1rem; }
   .job-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--r2); padding:1.5rem; display:flex; justify-content:space-between; align-items:flex-start; gap:1.5rem; transition:var(--transition); }
   .job-card:hover { border-color:var(--border2); box-shadow:var(--shadow); }
@@ -277,8 +279,8 @@
   .job-meta { display:flex; flex-wrap:wrap; gap:.75rem; font-size:.75rem; color:var(--text3); margin-bottom:.75rem; }
   .job-meta span { display:flex; align-items:center; gap:.25rem; }
   .job-tags { display:flex; gap:.5rem; flex-wrap:wrap; }
-  .tag { padding:.2rem .6rem; border-radius:999px; font-size:.7rem; font-weight:600; background:var(--bg3); color:var(--text3); }
-  .match-badge { font-family:'Clash Display',sans-serif; font-size:1.5rem; font-weight:700; text-align:center; min-width:80px; }
+  .tag { padding:.2rem .625rem; border-radius:999px; font-size:.7rem; font-weight:600; background:var(--bg3); color:var(--text2); border:1px solid var(--border); }
+  .match-badge { font-family:'Bricolage Grotesque',sans-serif; font-size:1.5rem; font-weight:700; text-align:center; min-width:80px; }
   .match-label { font-size:.65rem; color:var(--text3); text-align:center; }
   .match-ring { width:64px; height:64px; position:relative; display:flex; align-items:center; justify-content:center; }
 
@@ -286,14 +288,14 @@
   .builder-layout { display:grid; grid-template-columns:280px 1fr; gap:1.5rem; height:calc(100vh - 130px); }
   .builder-sidebar { background:var(--bg2); border:1px solid var(--border); border-radius:var(--r2); padding:1rem; overflow-y:auto; }
   .builder-preview { background:#fff; border:1px solid var(--border); border-radius:var(--r2); overflow:hidden; position:relative; }
-  .resume-paper { padding:2rem; min-height:100%; font-family:'Satoshi',sans-serif; color:#1a1a2e; }
-  .resume-paper .rh { background:linear-gradient(135deg,#6c63ff,#a89dff); color:#fff; padding:1.5rem 2rem; margin:-2rem -2rem 1.5rem; }
-  .resume-paper .rname { font-family:'Clash Display',sans-serif; font-size:1.5rem; font-weight:700; }
+  .resume-paper { padding:2rem; min-height:100%; font-family:'DM Sans',sans-serif; color:#1a1a2e; }
+  .resume-paper .rh { background:#005AFF; color:#fff; padding:1.5rem 2rem; margin:-2rem -2rem 1.5rem; }
+  .resume-paper .rname { font-family:'Bricolage Grotesque',sans-serif; font-size:1.5rem; font-weight:700; }
   .resume-paper .rtitle { font-size:.85rem; opacity:.85; }
   .resume-paper .rsec { margin-bottom:1.25rem; }
-  .resume-paper .rsec-title { font-size:.7rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#6c63ff; margin-bottom:.625rem; border-bottom:1px solid #e0e0f0; padding-bottom:.375rem; }
+  .resume-paper .rsec-title { font-size:.68rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#005AFF; margin-bottom:.625rem; border-bottom:1px solid #E5E3DB; padding-bottom:.375rem; }
   .drag-item { display:flex; align-items:center; gap:.625rem; padding:.625rem .75rem; background:var(--bg3); border:1px solid var(--border); border-radius:var(--r); margin-bottom:.5rem; cursor:grab; font-size:.8rem; transition:var(--transition); }
-  .drag-item:hover { border-color:var(--border2); }
+  .drag-item:hover { border-color:var(--border2); background:var(--bg4); }
   .drag-item i { color:var(--text3); font-size:.875rem; }
   .template-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:.5rem; margin-bottom:1rem; }
   .template-thumb { aspect-ratio:3/4; border-radius:var(--r); background:var(--bg3); border:2px solid transparent; cursor:pointer; overflow:hidden; transition:var(--transition); }
@@ -303,32 +305,32 @@
   /* ADMIN */
   .admin-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem; }
   .data-table { width:100%; border-collapse:collapse; }
-  .data-table th { text-align:left; font-size:.7rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text3); padding:.75rem 1rem; border-bottom:1px solid var(--border); }
+  .data-table th { text-align:left; font-size:.68rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text3); padding:.75rem 1rem; border-bottom:1px solid var(--border); }
   .data-table td { padding:.875rem 1rem; border-bottom:1px solid var(--border); font-size:.85rem; vertical-align:middle; }
-  .data-table tr:hover td { background:var(--glass); }
-  .status-badge { padding:.2rem .6rem; border-radius:999px; font-size:.7rem; font-weight:700; }
-  .status-active { background:rgba(74,222,128,0.15); color:#4ade80; }
-  .status-pending { background:rgba(255,179,71,0.15); color:#ffb347; }
-  .status-expired { background:rgba(248,113,113,0.15); color:#f87171; }
+  .data-table tr:hover td { background:var(--bg3); }
+  .status-badge { padding:.2rem .625rem; border-radius:999px; font-size:.68rem; font-weight:700; }
+  .status-active { background:rgba(26,107,74,0.12); color:var(--teal); border:1px solid rgba(26,107,74,0.2); }
+  .status-pending { background:rgba(160,92,26,0.1); color:var(--amber); border:1px solid rgba(160,92,26,0.2); }
+  .status-expired { background:rgba(185,28,28,0.1); color:var(--red); border:1px solid rgba(185,28,28,0.15); }
   .chart-bars { display:flex; align-items:flex-end; gap:4px; height:80px; }
-  .bar { flex:1; border-radius:4px 4px 0 0; background:rgba(108,99,255,0.3); transition:height .5s ease; }
-  .bar:hover { background:rgba(108,99,255,0.6); }
+  .bar { flex:1; border-radius:4px 4px 0 0; background:rgba(0,90,255,0.2); transition:height .5s ease; }
+  .bar:hover { background:rgba(0,90,255,0.45); }
 
   /* NOTIFICATIONS */
-  .notif-dropdown { position:absolute; top:100%; right:0; width:320px; background:var(--bg2); border:1px solid var(--border); border-radius:var(--r2); padding:.75rem; box-shadow:0 20px 40px rgba(0,0,0,.3); z-index:200; display:none; }
+  .notif-dropdown { position:absolute; top:100%; right:0; width:320px; background:var(--bg2); border:1px solid var(--border); border-radius:var(--r2); padding:.75rem; box-shadow:0 8px 32px rgba(0,0,0,0.12); z-index:200; display:none; }
   .notif-item { padding:.75rem; border-radius:var(--r); cursor:pointer; transition:var(--transition); display:flex; gap:.75rem; }
-  .notif-item:hover { background:var(--glass); }
+  .notif-item:hover { background:var(--bg3); }
   .notif-dot { width:8px; height:8px; border-radius:50%; background:var(--accent); margin-top:.3rem; flex-shrink:0; }
   .notif-text { font-size:.8rem; color:var(--text2); line-height:1.5; }
   .notif-time { font-size:.7rem; color:var(--text3); margin-top:.2rem; }
   .notif-btn { position:relative; }
 
   /* UTIL */
-  .tabs { display:flex; gap:.25rem; background:var(--bg3); border-radius:var(--r); padding:.25rem; margin-bottom:1.5rem; }
-  .tab { padding:.5rem 1rem; border-radius:8px; font-size:.8rem; font-weight:600; cursor:pointer; color:var(--text2); transition:var(--transition); }
-  .tab.active { background:var(--bg2); color:var(--text); }
+  .tabs { display:flex; gap:.25rem; background:var(--bg3); border-radius:var(--r); padding:.25rem; margin-bottom:1.5rem; border:1px solid var(--border); }
+  .tab { padding:.5rem 1rem; border-radius:6px; font-size:.8rem; font-weight:600; cursor:pointer; color:var(--text2); transition:var(--transition); }
+  .tab.active { background:var(--bg2); color:var(--text); box-shadow:0 1px 4px rgba(0,0,0,0.08); }
   .section-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; }
-  .section-header h2 { font-size:1.25rem; }
+  .section-header h2 { font-size:1.2rem; }
   .divider-line { border:none; border-top:1px solid var(--border); margin:1.5rem 0; }
   .two-col { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
   .three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.5rem; }
@@ -340,7 +342,7 @@
   .mb-3 { margin-bottom:1.5rem; }
   .mt-1 { margin-top:.5rem; }
   .mt-2 { margin-top:1rem; }
-  .color-accent { color:var(--accent2); }
+  .color-accent { color:var(--accent); }
   .color-green { color:var(--green); }
   .color-red { color:var(--red); }
   .color-amber { color:var(--amber); }
@@ -353,17 +355,17 @@
   .fw-700 { font-weight:700; }
   .rounded-full { border-radius:999px; }
   .inline-flex { display:inline-flex; align-items:center; gap:.375rem; }
-  .ai-tag { background:linear-gradient(90deg,rgba(108,99,255,.2),rgba(0,212,170,.2)); border:1px solid rgba(108,99,255,.3); color:var(--accent3); font-size:.7rem; font-weight:700; padding:.2rem .6rem; border-radius:999px; }
+  .ai-tag { background:rgba(0,90,255,0.08); border:1px solid rgba(0,90,255,0.2); color:var(--accent); font-size:.68rem; font-weight:700; padding:.2rem .6rem; border-radius:999px; }
   .spinner { width:20px; height:20px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; }
   @keyframes spin { to{transform:rotate(360deg)} }
-  .loading-bar { height:3px; background:var(--grad1); border-radius:999px; animation:loading 2s ease-in-out; }
+  .loading-bar { height:3px; background:var(--accent); border-radius:999px; animation:loading 2s ease-in-out; }
   @keyframes loading { 0%{width:0%} 80%{width:90%} 100%{width:100%} }
   .skeleton { background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 50%,var(--bg3) 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:var(--r); }
   @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-  .page-title { font-size:1.75rem; font-weight:700; margin-bottom:.25rem; }
+  .page-title { font-family:'Bricolage Grotesque',sans-serif; font-size:1.75rem; font-weight:700; margin-bottom:.25rem; letter-spacing:-.02em; }
   .page-sub { font-size:.875rem; color:var(--text2); }
 
-  /* MOBILE RESPONSIVENESS */
+  /* MOBILE */
   @media(max-width:768px) {
     .sidebar { transform:translateX(-100%); }
     .sidebar.open { transform:translateX(0); }
@@ -389,10 +391,10 @@
 
   /* TOAST */
   .toast-container { position:fixed; bottom:1.5rem; right:1.5rem; z-index:9999; display:flex; flex-direction:column; gap:.5rem; }
-  .toast { background:var(--bg2); border:1px solid var(--border); border-radius:var(--r); padding:.875rem 1.25rem; font-size:.85rem; max-width:320px; animation:slideIn .3s ease; box-shadow:0 10px 30px rgba(0,0,0,.3); display:flex; align-items:center; gap:.75rem; }
+  .toast { background:var(--bg2); border:1px solid var(--border); border-radius:var(--r); padding:.875rem 1.25rem; font-size:.85rem; max-width:320px; animation:slideIn .3s ease; box-shadow:0 4px 20px rgba(0,0,0,0.1); display:flex; align-items:center; gap:.75rem; }
   @keyframes slideIn { from{transform:translateX(100%);opacity:0} to{transform:translateX(0);opacity:1} }
-  .toast.success { border-color:rgba(74,222,128,.4); }
-  .toast.error { border-color:rgba(248,113,113,.4); }
+  .toast.success { border-left:3px solid var(--teal); }
+  .toast.error { border-left:3px solid var(--red); }
 
   /* LANG TOGGLE */
   .lang-badge { font-size:.7rem; font-weight:700; padding:.2rem .5rem; border-radius:999px; background:var(--bg3); border:1px solid var(--border); color:var(--text2); cursor:pointer; }
@@ -415,7 +417,7 @@
     <div class="notif-btn" id="notifBtn" onclick="toggleNotif()" style="position:relative">
       <button class="btn btn-ghost btn-sm" style="width:36px;height:36px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:50%">
         <i class="fa-solid fa-bell"></i>
-        <span style="position:absolute;top:4px;right:4px;width:8px;height:8px;background:var(--pink);border-radius:50%;border:2px solid var(--bg)"></span>
+        <span style="position:absolute;top:4px;right:4px;width:8px;height:8px;background:var(--accent);border-radius:50%;border:2px solid var(--bg2)"></span>
       </button>
       <div class="notif-dropdown" id="notifDropdown">
         <div style="font-size:.75rem;font-weight:700;color:var(--text3);margin-bottom:.5rem;padding:0 .5rem">Notifications</div>
@@ -462,34 +464,34 @@
       <p class="section-sub">Our AI analyzes every aspect of your resume and career profile to maximize your chances.</p>
       <div class="features-grid">
         <div class="feature-card">
-          <div class="feature-icon" style="background:rgba(108,99,255,0.15)"><i class="fa-solid fa-brain" style="color:var(--accent2)"></i></div>
+          <div class="feature-icon" style="background:rgba(0,90,255,0.1)"><i class="fa-solid fa-brain" style="color:var(--accent)"></i></div>
           <h3>AI Resume Analysis</h3>
           <p>Advanced NLP scans your resume against thousands of job descriptions to identify gaps and strengths instantly.</p>
           <div class="mt-2"><span class="ai-tag">✦ AI Powered</span></div>
         </div>
         <div class="feature-card">
-          <div class="feature-icon" style="background:rgba(0,212,170,0.15)"><i class="fa-solid fa-bullseye" style="color:var(--teal)"></i></div>
+          <div class="feature-icon" style="background:rgba(26,107,74,0.1)"><i class="fa-solid fa-bullseye" style="color:var(--teal)"></i></div>
           <h3>ATS Compatibility Score</h3>
           <p>Get a detailed ATS score and learn exactly how to optimize your resume to pass automated screening systems.</p>
         </div>
         <div class="feature-card">
-          <div class="feature-icon" style="background:rgba(255,107,157,0.15)"><i class="fa-solid fa-magnifying-glass-chart" style="color:var(--pink)"></i></div>
+          <div class="feature-icon" style="background:rgba(155,48,88,0.1)"><i class="fa-solid fa-magnifying-glass-chart" style="color:var(--pink)"></i></div>
           <h3>Smart Job Matching</h3>
           <p>Our AI engine matches you with jobs where you have the highest chance of success based on your profile.</p>
           <div class="mt-2"><span class="ai-tag">✦ AI Powered</span></div>
         </div>
         <div class="feature-card">
-          <div class="feature-icon" style="background:rgba(255,179,71,0.15)"><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--amber)"></i></div>
+          <div class="feature-icon" style="background:rgba(160,92,26,0.1)"><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--amber)"></i></div>
           <h3>Skill Gap Analysis</h3>
           <p>Identify missing skills for your target roles and get personalized learning recommendations to close the gaps.</p>
         </div>
         <div class="feature-card">
-          <div class="feature-icon" style="background:rgba(96,165,250,0.15)"><i class="fa-solid fa-file-pen" style="color:var(--blue)"></i></div>
+          <div class="feature-icon" style="background:rgba(0,90,255,0.08)"><i class="fa-solid fa-file-pen" style="color:var(--accent)"></i></div>
           <h3>Resume Builder</h3>
           <p>Create a stunning, ATS-optimized resume from scratch using our drag-and-drop builder with premium templates.</p>
         </div>
         <div class="feature-card">
-          <div class="feature-icon" style="background:rgba(74,222,128,0.15)"><i class="fa-solid fa-chart-line" style="color:var(--green)"></i></div>
+          <div class="feature-icon" style="background:rgba(26,107,74,0.1)"><i class="fa-solid fa-chart-line" style="color:var(--green)"></i></div>
           <h3>Career Analytics</h3>
           <p>Track your application success rate, interview performance, and career progress with detailed analytics.</p>
         </div>
@@ -548,7 +550,7 @@
           <div class="stars">★★★★★</div>
           <p>"ResumeAI helped me land a job at Google! My ATS score went from 42 to 91 after following their suggestions. Absolutely incredible tool."</p>
           <div class="testimonial-author">
-            <div class="avatar" style="background:rgba(108,99,255,0.2);color:var(--accent2)">SK</div>
+            <div class="avatar" style="background:rgba(0,90,255,0.1);color:var(--accent)">SK</div>
             <div class="author-info"><div class="name">Sarah Kim</div><div class="title">Software Engineer at Google</div></div>
           </div>
         </div>
@@ -556,7 +558,7 @@
           <div class="stars">★★★★★</div>
           <p>"The job matching feature is phenomenal. Found 3 perfect-fit roles within a week and got interviews for all of them. Game changer!"</p>
           <div class="testimonial-author">
-            <div class="avatar" style="background:rgba(0,212,170,0.2);color:var(--teal)">MR</div>
+            <div class="avatar" style="background:rgba(26,107,74,0.12);color:var(--teal)">MR</div>
             <div class="author-info"><div class="name">Marcus Rivera</div><div class="title">Product Manager at Stripe</div></div>
           </div>
         </div>
@@ -564,7 +566,7 @@
           <div class="stars">★★★★★</div>
           <p>"As a career changer, I had no idea how to tailor my resume. ResumeAI showed me exactly what skills to highlight. Got hired in 3 weeks!"</p>
           <div class="testimonial-author">
-            <div class="avatar" style="background:rgba(255,107,157,0.2);color:var(--pink)">AM</div>
+            <div class="avatar" style="background:rgba(155,48,88,0.1);color:var(--pink)">AM</div>
             <div class="author-info"><div class="name">Amira Malik</div><div class="title">Data Analyst at Airbnb</div></div>
           </div>
         </div>
@@ -656,13 +658,10 @@
   <!-- CTA BANNER -->
   <section>
     <div class="container">
-      <div style="background:var(--grad1);border-radius:var(--r3);padding:4rem 3rem;text-align:center;position:relative;overflow:hidden">
-        <div style="position:absolute;inset:0;background:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2280%22 cy=%2220%22 r=%2230%22 fill=%22rgba(255,255,255,0.05)%22/><circle cx=%2210%22 cy=%2280%22 r=%2240%22 fill=%22rgba(255,255,255,0.05)%22/></svg>');"></div>
-        <div style="position:relative">
-          <h2 style="font-size:2rem;color:#fff;margin-bottom:1rem">Ready to Land Your Dream Job?</h2>
-          <p style="color:rgba(255,255,255,.8);margin-bottom:2rem">Join 50,000+ professionals who've transformed their careers with ResumeAI.</p>
-          <button class="btn btn-lg" style="background:#fff;color:var(--accent);font-weight:700" onclick="goTo('register')">Start Free — No Credit Card Required</button>
-        </div>
+      <div style="background:var(--accent);border-radius:var(--r2);padding:4rem 3rem;text-align:center">
+        <h2 style="font-size:2rem;color:#fff;margin-bottom:1rem;font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.02em">Ready to Land Your Dream Job?</h2>
+        <p style="color:rgba(255,255,255,.82);margin-bottom:2rem;font-size:1.05rem">Join 50,000+ professionals who've transformed their careers with ResumeAI.</p>
+        <button class="btn btn-lg" style="background:#fff;color:var(--accent);font-weight:700;border:none" onclick="goTo('register')">Start Free — No Credit Card Required</button>
       </div>
     </div>
   </section>
@@ -744,11 +743,11 @@
       <div class="two-col" style="gap:.875rem">
         <div class="form-group" style="margin-bottom:0">
           <label>FIRST NAME</label>
-          <input type="text" placeholder="John" id="registerFirstName" style="width:100%;padding:.75rem 1rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:.875rem;font-family:'Satoshi',sans-serif;outline:none" />
+          <input type="text" placeholder="John" id="registerFirstName" style="width:100%;padding:.75rem 1rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:.875rem;font-family:'DM Sans',sans-serif;outline:none" />
         </div>
         <div class="form-group" style="margin-bottom:0">
           <label>LAST NAME</label>
-          <input type="text" placeholder="Doe" id="registerLastName" style="width:100%;padding:.75rem 1rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:.875rem;font-family:'Satoshi',sans-serif;outline:none" />
+          <input type="text" placeholder="Doe" id="registerLastName" style="width:100%;padding:.75rem 1rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:.875rem;font-family:'DM Sans',sans-serif;outline:none" />
         </div>
       </div>
       <div class="form-group" style="margin-top:.875rem">
@@ -782,7 +781,7 @@
   <div class="auth-page">
     <div class="auth-card">
       <div class="auth-logo"><span class="logo">ResumeAI ✦</span></div>
-      <div style="text-align:center;margin-bottom:1.5rem"><div style="width:64px;height:64px;border-radius:50%;background:rgba(108,99,255,.15);display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto 1rem"><i class="fa-solid fa-envelope" style="color:var(--accent2)"></i></div></div>
+      <div style="text-align:center;margin-bottom:1.5rem"><div style="width:64px;height:64px;border-radius:50%;background:rgba(0,90,255,.1);display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto 1rem"><i class="fa-solid fa-envelope" style="color:var(--accent)"></i></div></div>
       <h2>Reset Password</h2>
       <div class="sub">Enter your email and we'll send a reset link</div>
       <div class="form-group" style="margin-top:1.5rem">
@@ -836,39 +835,39 @@
         <div class="overview-grid">
           <div class="metric-card">
             <div class="metric-header">
-              <div class="metric-icon" style="background:rgba(108,99,255,.15)"><i class="fa-solid fa-file-lines" style="color:var(--accent2)"></i></div>
+              <div class="metric-icon" style="background:rgba(0,90,255,.1)"><i class="fa-solid fa-file-lines" style="color:var(--accent)"></i></div>
               <div class="metric-trend trend-up"><i class="fa-solid fa-arrow-up"></i> 12%</div>
             </div>
-            <div class="metric-value grad-text" id="metricAtsScore">87</div>
+            <div class="metric-value" style="color:var(--accent)" id="metricAtsScore">87</div>
             <div class="metric-label">Resume ATS Score</div>
-            <div class="progress-bar"><div class="progress-fill" id="metricAtsBar" style="width:87%;background:var(--grad1)"></div></div>
+            <div class="progress-bar"><div class="progress-fill" id="metricAtsBar" style="width:87%;background:var(--accent)"></div></div>
           </div>
           <div class="metric-card">
             <div class="metric-header">
-              <div class="metric-icon" style="background:rgba(0,212,170,.15)"><i class="fa-solid fa-briefcase" style="color:var(--teal)"></i></div>
+              <div class="metric-icon" style="background:rgba(26,107,74,.1)"><i class="fa-solid fa-briefcase" style="color:var(--teal)"></i></div>
               <div class="metric-trend trend-up"><i class="fa-solid fa-arrow-up"></i> 5 new</div>
             </div>
             <div class="metric-value" style="color:var(--teal)" id="metricJobMatches">24</div>
             <div class="metric-label">Job Matches Found</div>
-            <div class="progress-bar"><div class="progress-fill" style="width:80%;background:var(--grad2)"></div></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:80%;background:var(--teal)"></div></div>
           </div>
           <div class="metric-card">
             <div class="metric-header">
-              <div class="metric-icon" style="background:rgba(255,107,157,.15)"><i class="fa-solid fa-paper-plane" style="color:var(--pink)"></i></div>
+              <div class="metric-icon" style="background:rgba(155,48,88,.1)"><i class="fa-solid fa-paper-plane" style="color:var(--pink)"></i></div>
               <div class="metric-trend trend-up"><i class="fa-solid fa-arrow-up"></i> 2 this week</div>
             </div>
             <div class="metric-value" style="color:var(--pink)" id="metricApplicationsSent">7</div>
             <div class="metric-label">Applications Sent</div>
-            <div class="progress-bar"><div class="progress-fill" style="width:35%;background:var(--grad3)"></div></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:35%;background:var(--pink)"></div></div>
           </div>
           <div class="metric-card">
             <div class="metric-header">
-              <div class="metric-icon" style="background:rgba(255,179,71,.15)"><i class="fa-solid fa-calendar" style="color:var(--amber)"></i></div>
+              <div class="metric-icon" style="background:rgba(160,92,26,.1)"><i class="fa-solid fa-calendar" style="color:var(--amber)"></i></div>
               <div class="metric-trend trend-up"><i class="fa-solid fa-arrow-up"></i> 28% rate</div>
             </div>
             <div class="metric-value" style="color:var(--amber)" id="metricInterviews">2</div>
             <div class="metric-label">Interviews Scheduled</div>
-            <div class="progress-bar"><div class="progress-fill" style="width:28%;background:linear-gradient(90deg,var(--amber),#ffcc80)"></div></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:28%;background:var(--amber)"></div></div>
           </div>
         </div>
 
@@ -928,7 +927,7 @@
           </div>
         </div>
         <div class="three-col">
-          <div class="metric-card"><div class="metric-value grad-text">68%</div><div class="metric-label">Response Rate</div></div>
+          <div class="metric-card"><div class="metric-value" style="color:var(--accent)">68%</div><div class="metric-label">Response Rate</div></div>
           <div class="metric-card"><div class="metric-value" style="color:var(--teal)">4.2</div><div class="metric-label">Avg Days to Interview</div></div>
           <div class="metric-card"><div class="metric-value" style="color:var(--amber)">91st</div><div class="metric-label">Percentile in Field</div></div>
         </div>
@@ -960,7 +959,7 @@
             <h3 class="text-sm fw-700 mb-2">Current Skills</h3>
             <div class="skills-grid" style="grid-template-columns:1fr">
               <div class="skill-item"><div class="skill-name"><span>React.js</span><span class="color-green">95%</span></div><div class="progress-bar"><div class="progress-fill" style="width:95%;background:var(--green)"></div></div></div>
-              <div class="skill-item"><div class="skill-name"><span>TypeScript</span><span class="color-accent">78%</span></div><div class="progress-bar"><div class="progress-fill" style="width:78%;background:var(--grad1)"></div></div></div>
+              <div class="skill-item"><div class="skill-name"><span>TypeScript</span><span class="color-accent">78%</span></div><div class="progress-bar"><div class="progress-fill" style="width:78%;background:var(--accent)"></div></div></div>
               <div class="skill-item"><div class="skill-name"><span>Node.js</span><span class="color-teal">65%</span></div><div class="progress-bar"><div class="progress-fill" style="width:65%;background:var(--teal)"></div></div></div>
               <div class="skill-item"><div class="skill-name"><span>Python</span><span class="color-amber">42%</span></div><div class="progress-bar"><div class="progress-fill" style="width:42%;background:var(--amber)"></div></div></div>
             </div>
@@ -1023,19 +1022,19 @@
               <h2 class="mb-1">ATS Compatibility Score</h2>
               <p class="text-sm text-muted mb-2">Your resume scores in the <strong style="color:var(--green)">top 15%</strong> of analyzed resumes</p>
               <div style="display:flex;gap:.75rem;flex-wrap:wrap">
-                <div style="text-align:center;padding:.75rem 1.25rem;background:var(--bg3);border-radius:var(--r)"><div id="scoreFormatting" style="font-family:'Clash Display',sans-serif;font-size:1.5rem;font-weight:700;color:var(--green)">91</div><div class="text-xs text-dim">Formatting</div></div>
-                <div style="text-align:center;padding:.75rem 1.25rem;background:var(--bg3);border-radius:var(--r)"><div id="scoreKeywords" style="font-family:'Clash Display',sans-serif;font-size:1.5rem;font-weight:700;color:var(--amber)">74</div><div class="text-xs text-dim">Keywords</div></div>
-                <div style="text-align:center;padding:.75rem 1.25rem;background:var(--bg3);border-radius:var(--r)"><div id="scoreExperience" style="font-family:'Clash Display',sans-serif;font-size:1.5rem;font-weight:700;color:var(--accent2)">88</div><div class="text-xs text-dim">Experience</div></div>
-                <div style="text-align:center;padding:.75rem 1.25rem;background:var(--bg3);border-radius:var(--r)"><div id="scoreEducation" style="font-family:'Clash Display',sans-serif;font-size:1.5rem;font-weight:700;color:var(--teal)">95</div><div class="text-xs text-dim">Education</div></div>
+                <div style="text-align:center;padding:.75rem 1.25rem;background:var(--bg3);border-radius:var(--r);border:1px solid var(--border)"><div id="scoreFormatting" style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.5rem;font-weight:700;color:var(--green)">91</div><div class="text-xs text-dim">Formatting</div></div>
+                <div style="text-align:center;padding:.75rem 1.25rem;background:var(--bg3);border-radius:var(--r);border:1px solid var(--border)"><div id="scoreKeywords" style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.5rem;font-weight:700;color:var(--amber)">74</div><div class="text-xs text-dim">Keywords</div></div>
+                <div style="text-align:center;padding:.75rem 1.25rem;background:var(--bg3);border-radius:var(--r);border:1px solid var(--border)"><div id="scoreExperience" style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.5rem;font-weight:700;color:var(--accent)">88</div><div class="text-xs text-dim">Experience</div></div>
+                <div style="text-align:center;padding:.75rem 1.25rem;background:var(--bg3);border-radius:var(--r);border:1px solid var(--border)"><div id="scoreEducation" style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.5rem;font-weight:700;color:var(--teal)">95</div><div class="text-xs text-dim">Education</div></div>
               </div>
             </div>
             <div style="text-align:center">
               <svg width="160" height="160" viewBox="0 0 160 160">
-                <circle cx="80" cy="80" r="65" fill="none" stroke="var(--bg3)" stroke-width="14"/>
+                <circle cx="80" cy="80" r="65" fill="none" stroke="var(--border)" stroke-width="14"/>
                 <circle cx="80" cy="80" r="65" fill="none" stroke="url(#scoreGrad)" stroke-width="14" stroke-linecap="round" stroke-dasharray="408.4" stroke-dashoffset="53" id="scoreRingFill" transform="rotate(-90 80 80)"/>
-                <defs><linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#6c63ff"/><stop offset="100%" stop-color="#00d4aa"/></linearGradient></defs>
-                <text x="80" y="75" text-anchor="middle" font-family="Clash Display" font-size="28" font-weight="700" fill="var(--text)" id="scoreOverallText">87</text>
-                <text x="80" y="96" text-anchor="middle" font-family="Satoshi" font-size="12" fill="var(--text3)">/ 100</text>
+                <defs><linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#005AFF"/><stop offset="100%" stop-color="#1A6B4A"/></linearGradient></defs>
+                <text x="80" y="75" text-anchor="middle" font-family="Bricolage Grotesque" font-size="28" font-weight="700" fill="var(--text)" id="scoreOverallText">87</text>
+                <text x="80" y="96" text-anchor="middle" font-family="DM Sans" font-size="12" fill="var(--text3)">/ 100</text>
               </svg>
               <div class="text-xs text-dim">Overall ATS Score</div>
             </div>
@@ -1076,7 +1075,7 @@
           <div class="section-header mb-2"><h3 class="fw-700">Skill Gap Analysis</h3><span class="ai-tag">✦ AI Powered</span></div>
           <div class="skills-grid">
             <div class="skill-item"><div class="skill-name"><span>JavaScript</span><span class="color-green">95%</span></div><div class="progress-bar"><div class="progress-fill" style="width:95%;background:var(--green)"></div></div></div>
-            <div class="skill-item"><div class="skill-name"><span>React.js</span><span class="color-green">90%</span></div><div class="progress-bar"><div class="progress-fill" style="width:90%;background:var(--teal)"></div></div></div>
+            <div class="skill-item"><div class="skill-name"><span>React.js</span><span class="color-green">90%</span></div><div class="progress-bar"><div class="progress-fill" style="width:90%;background:var(--green)"></div></div></div>
             <div class="skill-item"><div class="skill-name"><span>Node.js</span><span class="color-accent">72%</span></div><div class="progress-bar"><div class="progress-fill" style="width:72%;background:var(--accent)"></div></div></div>
             <div class="skill-item"><div class="skill-name"><span>TypeScript</span><span class="color-amber">45%</span></div><div class="progress-bar"><div class="progress-fill" style="width:45%;background:var(--amber)"></div></div></div>
             <div class="skill-item"><div class="skill-name"><span>Docker</span><span class="color-red">20%</span></div><div class="progress-bar"><div class="progress-fill" style="width:20%;background:var(--red)"></div></div></div>
@@ -1110,13 +1109,13 @@
         <div style="padding:0 1rem">
           <div class="form-group">
             <label style="font-size:.7rem;color:var(--text3)">EXPERIENCE</label>
-            <select style="width:100%;padding:.5rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:.8rem;font-family:'Satoshi',sans-serif;outline:none">
+            <select style="width:100%;padding:.5rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:.8rem;font-family:'DM Sans',sans-serif;outline:none">
               <option>Any Level</option><option>Junior (0-2yr)</option><option>Mid (3-5yr)</option><option>Senior (5+yr)</option>
             </select>
           </div>
           <div class="form-group">
             <label style="font-size:.7rem;color:var(--text3)">SALARY</label>
-            <select style="width:100%;padding:.5rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:.8rem;font-family:'Satoshi',sans-serif;outline:none">
+            <select style="width:100%;padding:.5rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:.8rem;font-family:'DM Sans',sans-serif;outline:none">
               <option>Any Range</option><option>$50K-$80K</option><option>$80K-$120K</option><option>$120K+</option>
             </select>
           </div>
@@ -1157,7 +1156,7 @@
             </div>
           </div>
           <div style="text-align:center;min-width:90px">
-            <div style="font-family:'Clash Display',sans-serif;font-size:2rem;font-weight:700;color:var(--green)">94%</div>
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:2rem;font-weight:700;color:var(--green)">94%</div>
             <div class="text-xs text-dim mb-2">match</div>
             <button class="btn btn-primary btn-sm" style="width:100%;margin-bottom:.375rem" onclick="showToast('Application submitted!','success')">Apply</button>
             <button class="btn btn-ghost btn-sm" style="width:100%" onclick="saveJob(this)"><i class="fa-regular fa-bookmark"></i></button>
@@ -1178,7 +1177,7 @@
             <div class="job-tags"><span class="tag">Figma</span><span class="tag">UX</span><span class="tag">Prototyping</span></div>
           </div>
           <div style="text-align:center;min-width:90px">
-            <div style="font-family:'Clash Display',sans-serif;font-size:2rem;font-weight:700;color:var(--teal)">87%</div>
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:2rem;font-weight:700;color:var(--teal)">87%</div>
             <div class="text-xs text-dim mb-2">match</div>
             <button class="btn btn-primary btn-sm" style="width:100%;margin-bottom:.375rem" onclick="showToast('Application submitted!','success')">Apply</button>
             <button class="btn btn-ghost btn-sm" style="width:100%" onclick="saveJob(this)"><i class="fa-regular fa-bookmark"></i></button>
@@ -1199,10 +1198,10 @@
             <div class="job-tags"><span class="tag">React</span><span class="tag">Next.js</span><span class="tag">Vercel</span><span class="tag">Performance</span></div>
           </div>
           <div style="text-align:center;min-width:90px">
-            <div style="font-family:'Clash Display',sans-serif;font-size:2rem;font-weight:700;color:var(--accent2)">82%</div>
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:2rem;font-weight:700;color:var(--accent)">82%</div>
             <div class="text-xs text-dim mb-2">match</div>
             <button class="btn btn-primary btn-sm" style="width:100%;margin-bottom:.375rem" onclick="showToast('Application submitted!','success')">Apply</button>
-            <button class="btn btn-ghost btn-sm" style="width:100%" onclick="saveJob(this)"><i class="fa-solid fa-bookmark" style="color:var(--accent2)"></i></button>
+            <button class="btn btn-ghost btn-sm" style="width:100%" onclick="saveJob(this)"><i class="fa-solid fa-bookmark" style="color:var(--accent)"></i></button>
           </div>
         </div>
 
@@ -1220,7 +1219,7 @@
             <div class="job-tags"><span class="tag">React</span><span class="tag">Design Systems</span><span class="tag">Animation</span></div>
           </div>
           <div style="text-align:center;min-width:90px">
-            <div style="font-family:'Clash Display',sans-serif;font-size:2rem;font-weight:700;color:var(--amber)">76%</div>
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:2rem;font-weight:700;color:var(--amber)">76%</div>
             <div class="text-xs text-dim mb-2">match</div>
             <button class="btn btn-primary btn-sm" style="width:100%;margin-bottom:.375rem" onclick="showToast('Application submitted!','success')">Apply</button>
             <button class="btn btn-ghost btn-sm" style="width:100%" onclick="saveJob(this)"><i class="fa-regular fa-bookmark"></i></button>
@@ -1256,7 +1255,7 @@
         <div class="builder-sidebar">
           <div class="text-xs text-dim fw-700 mb-2" style="letter-spacing:.1em;text-transform:uppercase">Templates</div>
           <div class="template-grid mb-3">
-            <div class="template-thumb active" style="background:linear-gradient(135deg,#6c63ff20,#6c63ff10)"><div style="height:100%;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:600;color:var(--accent2)">Modern</div></div>
+            <div class="template-thumb active" style="background:rgba(0,90,255,0.08)"><div style="height:100%;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:600;color:var(--accent)">Modern</div></div>
             <div class="template-thumb" style="background:var(--bg3)"><div style="height:100%;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:600;color:var(--text3)">Classic</div></div>
             <div class="template-thumb" style="background:var(--bg3)"><div style="height:100%;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:600;color:var(--text3)">Minimal</div></div>
           </div>
@@ -1299,7 +1298,7 @@
                   <div style="font-weight:700;font-size:.85rem;color:#1a1a2e">Senior Frontend Developer</div>
                   <div style="font-size:.7rem;color:#888">2022 – Present</div>
                 </div>
-                <div style="font-size:.75rem;color:#6c63ff;margin-bottom:.375rem">TechCorp Inc. · Remote</div>
+                <div style="font-size:.75rem;color:#005AFF;margin-bottom:.375rem">TechCorp Inc. · Remote</div>
                 <ul style="font-size:.75rem;color:#555;line-height:1.8;padding-left:1rem">
                   <li>Led migration to React 18, improving performance by 42%</li>
                   <li>Architected micro-frontend system serving 2M+ users</li>
@@ -1310,18 +1309,18 @@
             <div class="rsec">
               <div class="rsec-title">Skills</div>
               <div style="display:flex;flex-wrap:wrap;gap:.375rem">
-                <span style="background:#6c63ff15;color:#6c63ff;padding:.2rem .6rem;border-radius:999px;font-size:.7rem;font-weight:600">React.js</span>
-                <span style="background:#6c63ff15;color:#6c63ff;padding:.2rem .6rem;border-radius:999px;font-size:.7rem;font-weight:600">TypeScript</span>
-                <span style="background:#6c63ff15;color:#6c63ff;padding:.2rem .6rem;border-radius:999px;font-size:.7rem;font-weight:600">Node.js</span>
-                <span style="background:#6c63ff15;color:#6c63ff;padding:.2rem .6rem;border-radius:999px;font-size:.7rem;font-weight:600">GraphQL</span>
-                <span style="background:#6c63ff15;color:#6c63ff;padding:.2rem .6rem;border-radius:999px;font-size:.7rem;font-weight:600">AWS</span>
-                <span style="background:#6c63ff15;color:#6c63ff;padding:.2rem .6rem;border-radius:999px;font-size:.7rem;font-weight:600">Docker</span>
+                <span style="background:rgba(0,90,255,0.08);color:#005AFF;padding:.2rem .6rem;border-radius:999px;font-size:.7rem;font-weight:600">React.js</span>
+                <span style="background:rgba(0,90,255,0.08);color:#005AFF;padding:.2rem .6rem;border-radius:999px;font-size:.7rem;font-weight:600">TypeScript</span>
+                <span style="background:rgba(0,90,255,0.08);color:#005AFF;padding:.2rem .6rem;border-radius:999px;font-size:.7rem;font-weight:600">Node.js</span>
+                <span style="background:rgba(0,90,255,0.08);color:#005AFF;padding:.2rem .6rem;border-radius:999px;font-size:.7rem;font-weight:600">GraphQL</span>
+                <span style="background:rgba(0,90,255,0.08);color:#005AFF;padding:.2rem .6rem;border-radius:999px;font-size:.7rem;font-weight:600">AWS</span>
+                <span style="background:rgba(0,90,255,0.08);color:#005AFF;padding:.2rem .6rem;border-radius:999px;font-size:.7rem;font-weight:600">Docker</span>
               </div>
             </div>
             <div class="rsec">
               <div class="rsec-title">Education</div>
               <div style="display:flex;justify-content:space-between">
-                <div><div style="font-weight:700;font-size:.85rem;color:#1a1a2e">B.Sc. Computer Science</div><div style="font-size:.75rem;color:#6c63ff">MIT · Cambridge, MA</div></div>
+                <div><div style="font-weight:700;font-size:.85rem;color:#1a1a2e">B.Sc. Computer Science</div><div style="font-size:.75rem;color:#005AFF">MIT · Cambridge, MA</div></div>
                 <div style="font-size:.7rem;color:#888">2016 – 2020</div>
               </div>
             </div>
@@ -1358,10 +1357,10 @@
           <button class="btn btn-primary btn-sm"><i class="fa-solid fa-download" style="margin-right:.375rem"></i>Export Report</button>
         </div>
         <div class="overview-grid mb-3">
-          <div class="metric-card"><div class="metric-icon" style="background:rgba(108,99,255,.15);margin-bottom:1rem"><i class="fa-solid fa-users" style="color:var(--accent2)"></i></div><div class="metric-value grad-text">12,847</div><div class="metric-label">Total Users</div></div>
-          <div class="metric-card"><div class="metric-icon" style="background:rgba(0,212,170,.15);margin-bottom:1rem"><i class="fa-solid fa-file-lines" style="color:var(--teal)"></i></div><div class="metric-value" style="color:var(--teal)">48,392</div><div class="metric-label">Resumes Analyzed</div></div>
-          <div class="metric-card"><div class="metric-icon" style="background:rgba(74,222,128,.15);margin-bottom:1rem"><i class="fa-solid fa-dollar-sign" style="color:var(--green)"></i></div><div class="metric-value" style="color:var(--green)">$24,830</div><div class="metric-label">Monthly Revenue</div></div>
-          <div class="metric-card"><div class="metric-icon" style="background:rgba(255,179,71,.15);margin-bottom:1rem"><i class="fa-solid fa-briefcase" style="color:var(--amber)"></i></div><div class="metric-value" style="color:var(--amber)">3,204</div><div class="metric-label">Active Jobs</div></div>
+          <div class="metric-card"><div class="metric-icon" style="background:rgba(0,90,255,.1);margin-bottom:1rem"><i class="fa-solid fa-users" style="color:var(--accent)"></i></div><div class="metric-value" style="color:var(--accent)">12,847</div><div class="metric-label">Total Users</div></div>
+          <div class="metric-card"><div class="metric-icon" style="background:rgba(26,107,74,.1);margin-bottom:1rem"><i class="fa-solid fa-file-lines" style="color:var(--teal)"></i></div><div class="metric-value" style="color:var(--teal)">48,392</div><div class="metric-label">Resumes Analyzed</div></div>
+          <div class="metric-card"><div class="metric-icon" style="background:rgba(26,107,74,.1);margin-bottom:1rem"><i class="fa-solid fa-dollar-sign" style="color:var(--green)"></i></div><div class="metric-value" style="color:var(--green)">$24,830</div><div class="metric-label">Monthly Revenue</div></div>
+          <div class="metric-card"><div class="metric-icon" style="background:rgba(160,92,26,.1);margin-bottom:1rem"><i class="fa-solid fa-briefcase" style="color:var(--amber)"></i></div><div class="metric-value" style="color:var(--amber)">3,204</div><div class="metric-label">Active Jobs</div></div>
         </div>
         <div class="card">
           <div class="section-header mb-2"><h3 class="text-sm fw-700">Weekly Signups</h3></div>
@@ -1431,7 +1430,7 @@
         <div class="admin-header"><div><div class="page-title mb-1">Subscriptions</div></div></div>
         <div class="overview-grid mb-3">
           <div class="metric-card"><div class="metric-value" style="color:var(--text3)">8,421</div><div class="metric-label">Free Users</div></div>
-          <div class="metric-card"><div class="metric-value grad-text">3,802</div><div class="metric-label">Pro Subscribers</div></div>
+          <div class="metric-card"><div class="metric-value" style="color:var(--accent)">3,802</div><div class="metric-label">Pro Subscribers</div></div>
           <div class="metric-card"><div class="metric-value" style="color:var(--amber)">624</div><div class="metric-label">Enterprise</div></div>
         </div>
         <div class="card">
@@ -1590,7 +1589,7 @@ function saveJob(btn, jobId) {
   const icon = btn.querySelector('i');
   if(icon.classList.contains('fa-regular')) {
     icon.className = 'fa-solid fa-bookmark';
-    icon.style.color = 'var(--accent2)';
+    icon.style.color = 'var(--accent)';
     showToast('Job saved!', 'success');
     if (jobId !== undefined) saveJobToServer(jobId);
   } else {
@@ -1763,8 +1762,8 @@ function renderJobs(jobs) {
     const grad = job.grad || 'linear-gradient(135deg,#6c63ff,#a89dff)';
     const tags = (job.tags || []).map(t => `<span class="tag">${t}</span>`).join('');
     const match = (job.match_percent === null || job.match_percent === undefined) ? '—' : job.match_percent + '%';
-    const matchColor = job.match_percent >= 90 ? 'var(--green)' : job.match_percent >= 80 ? 'var(--teal)' : job.match_percent >= 70 ? 'var(--accent2)' : 'var(--amber)';
-    const bookmarkIcon = job.saved ? `<i class="fa-solid fa-bookmark" style="color:var(--accent2)"></i>` : `<i class="fa-regular fa-bookmark"></i>`;
+    const matchColor = job.match_percent >= 90 ? 'var(--green)' : job.match_percent >= 80 ? 'var(--teal)' : job.match_percent >= 70 ? 'var(--accent)' : 'var(--amber)';
+    const bookmarkIcon = job.saved ? `<i class="fa-solid fa-bookmark" style="color:var(--accent)"></i>` : `<i class="fa-regular fa-bookmark"></i>`;
     return `
       <div class="job-card${job.saved ? ' saved' : ''}" data-job-id="${job.id}">
         <div class="job-info">
@@ -1780,7 +1779,7 @@ function renderJobs(jobs) {
           <div class="job-tags">${tags}</div>
         </div>
         <div style="text-align:center;min-width:90px">
-          <div style="font-family:'Clash Display',sans-serif;font-size:2rem;font-weight:700;color:${matchColor}">${match}</div>
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:2rem;font-weight:700;color:${matchColor}">${match}</div>
           <div class="text-xs text-dim mb-2">match</div>
           <button class="btn btn-primary btn-sm" style="width:100%;margin-bottom:.375rem" onclick="applyToJob(${job.id}, this)">${job.applied ? 'Applied' : 'Apply'}</button>
           <button class="btn btn-ghost btn-sm" style="width:100%" onclick="saveJob(this, ${job.id})">${bookmarkIcon}</button>
@@ -1854,7 +1853,7 @@ function showToast(msg, type) {
   const tc = document.getElementById('toastContainer');
   const t = document.createElement('div');
   t.className = 'toast ' + type;
-  const icon = type === 'success' ? '<i class="fa-solid fa-circle-check" style="color:var(--green)"></i>' : '<i class="fa-solid fa-circle-info" style="color:var(--accent2)"></i>';
+  const icon = type === 'success' ? '<i class="fa-solid fa-circle-check" style="color:var(--green)"></i>' : '<i class="fa-solid fa-circle-info" style="color:var(--accent)"></i>';
   t.innerHTML = icon + '<span>' + msg + '</span>';
   tc.appendChild(t);
   setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(100%)'; t.style.transition = 'all .3s'; setTimeout(() => t.remove(), 300); }, 3000);
