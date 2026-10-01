@@ -1,0 +1,52 @@
+/* ── Design tokens ── */
+:root {
+  --bg: #FAFAF8;
+  --bg2: #FFFFFF;
+  --bg3: #F4F3EF;
+  --bg4: #ECEAE4;
+  --glass: rgba(0,0,0,0.03);
+  --glass2: rgba(0,0,0,0.06);
+  --border: #E5E3DB;
+  --border2: #C9C6BC;
+  --text: #0F0F14;
+  --text2: #4A4A5A;
+  --text3: #8A8A9A;
+  --accent: #005AFF;
+  --accent2: #2B72FF;
+  --accent3: #6699FF;
+  --teal: #1A6B4A;
+  --teal2: #145538;
+  --pink: #9B3058;
+  --amber: #A05C1A;
+  --green: #1A6B4A;
+  --red: #B91C1C;
+  --blue: #005AFF;
+  --grad1: linear-gradient(135deg, #005AFF, #2B72FF);
+  --grad2: linear-gradient(135deg, #1A6B4A, #005AFF);
+  --grad3: linear-gradient(135deg, #9B3058, #005AFF);
+  --shadow: 0 2px 16px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04);
+  --r: 8px;
+  --r2: 12px;
+  --r3: 16px;
+  --transition: all 0.2s ease;
+}
+/* Dark mode via .light toggle (legacy name kept for JS compatibility) */
+.light {
+  --bg: #0F0F14;
+  --bg2: #18181F;
+  --bg3: #22222C;
+  --bg4: #2A2A36;
+  --glass: rgba(255,255,255,0.03);
+  --glass2: rgba(255,255,255,0.07);
+  --border: rgba(255,255,255,0.09);
+  --border2: rgba(255,255,255,0.16);
+  --text: #F0F0F5;
+  --text2: #8A8A9E;
+  --text3: #5A5A6E;
+  --shadow: 0 2px 16px rgba(0,0,0,0.4);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); overflow-x:hidden; transition:var(--transition); }
+h1,h2,h3,h4 { font-family:'Bricolage Grotesque',sans-serif; }
+.page { display:none; }
+.page.active { display:block; }

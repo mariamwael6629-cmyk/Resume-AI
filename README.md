@@ -30,7 +30,11 @@ track application progress, and match instantly with relevant job openings.
 
 ## 🛠️ Tech Stack & Architecture
 
-* **Frontend:** Single-file vanilla JS/HTML/CSS app (`resume_ai.html`) — no build step, no framework. Client-side routing via `goTo()` toggling `.page` sections.
+* **Frontend:** Vanilla JS/HTML/CSS app — no build step, no framework. Client-side routing via `goTo()` toggling `.page` sections.
+  * `resume_ai.html` — markup shell (entry point)
+  * `css/` — `tokens.css`, page styles (`landing`, `auth`, `dashboard`, `admin`), shared `components`, `responsive`, `animations`, `toast`
+  * `js/core/` — `config` (API base + app state), `api` (token + fetch helper), `ui` (navigation, theme, toggles), `toast`
+  * `js/features/` — `auth`, `jobs`, `dashboard`, `resume-analyzer`, `resume-builder`
 * **Backend:** Python, FastAPI + SQLAlchemy, SQLite (file-based DB, no separate DB server to install). Layered as `models/` → `schemas/` → `services/` → `api/`, assembled in `backend/app/main.py`.
 * **Auth:** JWT bearer tokens (PyJWT) + bcrypt password hashing (passlib).
 * **API docs:** Auto-generated interactive Swagger UI at `/docs` and ReDoc at `/redoc` once the backend is running — every endpoint is documented there, including request/response schemas.

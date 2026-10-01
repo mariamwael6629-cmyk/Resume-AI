@@ -1,0 +1,15 @@
+/* MOBILE */
+@media(max-width:768px) {
+  .sidebar { transform:translateX(-100%); }
+  .sidebar.open { transform:translateX(0); }
+  .main-content { margin-left:0; padding:1rem; }
+  .footer-grid { grid-template-columns:1fr 1fr; }
+  .two-col, .three-col { grid-template-columns:1fr; }
+  .builder-layout { grid-template-columns:1fr; }
+  .builder-preview { display:none; }
+  nav .nav-links { display:none; }
+}
+@media(max-width:480px) {
+  .footer-grid { grid-template-columns:1fr; }
+  .hero-stats { gap:1.5rem; }
+}
