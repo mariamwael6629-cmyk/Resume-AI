@@ -17,7 +17,7 @@ function renderJobs(jobs) {
   if (!container) return;
   container.innerHTML = jobs.map(job => {
     const initial = (job.initial || job.company || '?').charAt(0).toUpperCase();
-    const grad = job.grad || '#B68420';
+    const grad = job.grad || '#353331';
     const tags = (job.tags || []).map(t => `<span class="tag">${t}</span>`).join('');
     const match = (job.match_percent === null || job.match_percent === undefined) ? '—' : job.match_percent + '%';
     const matchColor = job.match_percent >= 90 ? 'var(--green)' : job.match_percent >= 80 ? 'var(--teal)' : job.match_percent >= 70 ? 'var(--accent)' : 'var(--amber)';
