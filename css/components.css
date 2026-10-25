@@ -37,7 +37,7 @@
 .fw-700 { font-weight:700; }
 .rounded-full { border-radius:999px; }
 .inline-flex { display:inline-flex; align-items:center; gap:.375rem; }
-.ai-tag { background:rgba(53,51,49,0.08); border:1px solid rgba(53,51,49,0.2); color:var(--accent); font-size:.68rem; font-weight:700; padding:.2rem .6rem; border-radius:999px; }
+.ai-tag { background:rgba(53,50,49,0.08); border:1px solid rgba(53,50,49,0.2); color:var(--accent); font-size:.68rem; font-weight:700; padding:.2rem .6rem; border-radius:999px; }
 .spinner { width:20px; height:20px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; }
 @keyframes spin { to{transform:rotate(360deg)} }
 .loading-bar { height:3px; background:var(--accent); border-radius:999px; animation:loading 2s ease-in-out; }
