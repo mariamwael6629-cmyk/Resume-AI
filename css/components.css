@@ -37,12 +37,12 @@
 .fw-700 { font-weight:700; }
 .rounded-full { border-radius:999px; }
 .inline-flex { display:inline-flex; align-items:center; gap:.375rem; }
-.ai-tag { background:rgba(0,90,255,0.08); border:1px solid rgba(0,90,255,0.2); color:var(--accent); font-size:.68rem; font-weight:700; padding:.2rem .6rem; border-radius:999px; }
+.ai-tag { background:rgba(182,132,32,0.08); border:1px solid rgba(182,132,32,0.2); color:var(--accent); font-size:.68rem; font-weight:700; padding:.2rem .6rem; border-radius:999px; }
 .spinner { width:20px; height:20px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; }
 @keyframes spin { to{transform:rotate(360deg)} }
 .loading-bar { height:3px; background:var(--accent); border-radius:999px; animation:loading 2s ease-in-out; }
 @keyframes loading { 0%{width:0%} 80%{width:90%} 100%{width:100%} }
-.skeleton { background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 50%,var(--bg3) 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:var(--r); }
+.skeleton { background:var(--bg3); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:var(--r); }
 @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 .page-title { font-family:'Bricolage Grotesque',sans-serif; font-size:1.75rem; font-weight:700; margin-bottom:.25rem; letter-spacing:-.02em; }
 .page-sub { font-size:.875rem; color:var(--text2); }
